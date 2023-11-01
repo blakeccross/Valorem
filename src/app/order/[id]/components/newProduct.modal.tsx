@@ -39,7 +39,7 @@ export default function NewProductModal({
   async function handleAddProduct() {
     const { data, error } = await supabase
       .from("products")
-      .insert([{ name: name, description: description, quantity: quantity, price: price || 0, size: size, type: category, orderId: orderId }])
+      .insert([{ description: description, quantity: quantity, price: price || 0, size: size, type: category, orderId: orderId }])
       .select();
     if (error) {
       alert(error.message);
@@ -212,7 +212,7 @@ export default function NewProductModal({
                   <Label>Price</Label>
                   <TextInput addon="$" required type="number" value={price} onChange={(e) => setPrice(e.target.valueAsNumber)} />
                 </div>
-                <div className="max-w-md" id="textarea">
+                {/* <div className="max-w-md" id="textarea">
                   <Label htmlFor="comment">Description</Label>
                   <Textarea
                     id="comment"
@@ -222,7 +222,7 @@ export default function NewProductModal({
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
-                </div>
+                </div> */}
 
                 <div className="flex justify-end">
                   <Button onClick={handleAddProduct}>Save</Button>
