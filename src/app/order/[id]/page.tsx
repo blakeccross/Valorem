@@ -93,7 +93,7 @@ export default function Page({ params }: { params: { id: string } }) {
   }
 
   function handleTabChange(selectedTab: string) {
-    router.push(`/order/9?orderId=1&view=${selectedTab}`);
+    router.push(`/order/${params.id}?orderId=${order?.order_id}&view=${selectedTab}`);
   }
 
   function getChangeOrder() {
