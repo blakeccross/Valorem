@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Database } from "../../../../../types/supabase";
+import { Database } from "../../../../../../types/supabase";
 import moment from "moment";
 type Order = Database["public"]["Tables"]["orders"]["Row"];
 import { Button, Checkbox, Label, Modal, TextInput, Select, Textarea } from "flowbite-react";

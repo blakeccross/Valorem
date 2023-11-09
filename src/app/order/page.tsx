@@ -1,6 +1,6 @@
 "use client";
 
-import { Timeline, Table, Badge, Dropdown } from "flowbite-react";
+import { Timeline, Table, Badge, Dropdown, Button } from "flowbite-react";
 import { useState, useEffect, useRef, Fragment, useContext } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../types/supabase";
@@ -19,7 +19,7 @@ import { HiCheck, HiClock } from "react-icons/hi";
 import ConfirmationModal from "@/components/confirmation.modal";
 import EditOrderModal from "./editOrder.modal";
 import { useRouter } from "next/navigation";
-import { BsArrowUpShort, BsArrowDownShort } from "react-icons/bs";
+import { BsArrowUpShort, BsArrowDownShort, BsCalendar, BsPlus } from "react-icons/bs";
 import { UserContext } from "@/context/userContext";
 
 export default function ClientView() {
@@ -45,9 +45,10 @@ export default function ClientView() {
   }, [orders]);
 
   async function getOrders() {
-    let { data: orders, error } = await supabase.from("orders").select("*").order("created_at");
+    let { data: orders, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
     if (orders) {
       setOrders(MergeProductsbyKey(orders, "order_id"));
+      console.log(MergeProductsbyKey(orders, "order_id"));
     }
   }
 
@@ -145,57 +146,48 @@ export default function ClientView() {
           </Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y">
-          {orders.map((item: OrderArray) => (
-            <Fragment key={item[0].id}>
-              <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={item[0].id}>
+          {orders.map((order: OrderArray) => (
+            <Fragment key={order[0].id}>
+              <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={order[0].id}>
                 <Table.Cell className="p-4 cursor-pointer">
-                  {viewHistory === item[0].id ? (
+                  {viewHistory === order[0].id ? (
                     <TfiAngleUp size={18} onClick={() => setViewHistory(null)} />
                   ) : (
-                    <TfiAngleDown size={18} onClick={() => setViewHistory(item[0].id)} />
+                    <TfiAngleDown size={18} onClick={() => setViewHistory(order[0].id)} />
                   )}
                 </Table.Cell>
-                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">{item[0].order_id}</Table.Cell>
-                <Table.Cell>{item[0].project_name}</Table.Cell>
-                <Table.Cell>{moment(item[0].created_at).format("MMMM DD, YYYY")}</Table.Cell>
-                <Table.Cell className="truncate">{item[0].address}</Table.Cell>
+                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">{order[0].order_id}</Table.Cell>
+                <Table.Cell>{order[0].project_name}</Table.Cell>
+                <Table.Cell>{moment(order[0].created_at).format("MMMM DD, YYYY")}</Table.Cell>
+                <Table.Cell className="truncate">{order[0].address}</Table.Cell>
                 <Table.Cell>
-                  <OrderStatus status={item[item.length - 1].status || ""} />
+                  <OrderStatus status={order[0].status || ""} />
                 </Table.Cell>
-                <Table.Cell className=" w-32">
+                <Table.Cell className="w-32">
                   <Link
                     className="font-medium text-cyan-600 hover:underline dark:text-cyan-500 text-center"
-                    href={{ pathname: `/order/${encodeURIComponent(item[item.length - 1].id)}`, query: { orderId: item[0].id } }}
+                    href={{ pathname: `/order/${encodeURIComponent(order[0].id)}`, query: { orderId: order[0].order_id } }}
                   >
-                    <p>{!item[item.length - 1].changeOrder ? "View Order" : "View CO"}</p>
+                    <p>{!order[0].change_order ? "View Order" : "View CO"}</p>
                   </Link>
                 </Table.Cell>
                 {user?.role === "client" && (
                   <Table.Cell className="">
-                    {/* <BiDotsVerticalRounded size={25} /> */}
                     <div className="relative cursor-pointer">
                       <Dropdown renderTrigger={() => <BiDotsVerticalRounded size={25} />} label="" className="!left-[-50px] !top-6">
                         <Dropdown.Item
                           onClick={() => {
-                            selectedOrder.current = item[0];
+                            selectedOrder.current = order[0];
                             setShowEditOrderModal(true);
                           }}
                         >
                           Edit
                         </Dropdown.Item>
-                        <Dropdown.Item
-                          onClick={() => {
-                            item[0].status !== "co"
-                              ? router.push(`/order/${encodeURIComponent(item[item.length - 1].order_id)}`)
-                              : router.push(`/order/co/${encodeURIComponent(item[item.length - 1].id)}?orderId=${item[0].id}`);
-                          }}
-                        >
-                          View
-                        </Dropdown.Item>
+                        <Dropdown.Item onClick={() => router.push(`/order/${order[0].id}?orderId=${order[0].order_id}`)}>View</Dropdown.Item>
                         <Dropdown.Item
                           onClick={() => {
                             setShowDeleteConfirmModal(true);
-                            selectedOrder.current = item[0];
+                            selectedOrder.current = order[0];
                           }}
                         >
                           Delete
@@ -205,13 +197,13 @@ export default function ClientView() {
                   </Table.Cell>
                 )}
               </Table.Row>
-              {viewHistory === item[0].id && (
+              {viewHistory === order[0].id && (
                 <Table.Cell colSpan={8}>
                   <div className="p-4">
                     <h5 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">Order history</h5>
 
                     <Timeline>
-                      {[...item].reverse().map((co, index, array) => (
+                      {[...order].slice(0, 3).map((co, index, array) => (
                         <Timeline.Item key={co.id}>
                           <Timeline.Point />
                           <Timeline.Content>
@@ -219,12 +211,17 @@ export default function ClientView() {
                               <div>
                                 <Timeline.Time>{moment(co.created_at).format("MMMM DD, YYYY")}</Timeline.Time>
                                 <Timeline.Title>
-                                  {co.order_id + "-" + (item.length - index)}
+                                  <a
+                                    className="hover:underline cursor-pointer"
+                                    onClick={() => router.push(`/order/view/${co.id}?orderId=${co.order_id}`)}
+                                  >
+                                    {co.order_id + "-" + (order.length - index)}
+                                  </a>
                                   <span className="flex flex-row text-sm">
                                     <p className="flex gap-1">
                                       <p>Total:</p>${co.cost}
                                     </p>
-                                    <PriceChangeStatus currentItem={co?.cost} previousItem={array[array.length - 1]?.cost} />
+                                    <PriceChangeStatus currentItem={co?.cost} previousItem={array[index + 1]?.cost} />
                                   </span>
                                   <p className="text-sm">
                                     {"Items: "}
@@ -243,6 +240,19 @@ export default function ClientView() {
                         </Timeline.Item>
                       ))}
                     </Timeline>
+                    {order.length > 3 && (
+                      <div className="flex justify-center items-center">
+                        <Link
+                          className="font-medium text-cyan-600 hover:underline dark:text-cyan-500 text-center"
+                          href={{
+                            pathname: `/order/${encodeURIComponent(order[0].id)}`,
+                            query: { orderId: order[0].id, view: "history" },
+                          }}
+                        >
+                          View More
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 </Table.Cell>
               )}

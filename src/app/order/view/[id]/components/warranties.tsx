@@ -3,7 +3,7 @@
 import { Timeline, Table, Badge, Button, Dropdown } from "flowbite-react";
 import { useState, useEffect, useContext } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Database } from "../../../../../types/supabase";
+import { Database } from "../../../../../../types/supabase";
 import moment from "moment";
 import NewWarrantyModal from "@/app/warranty/addWarrenty.modal";
 import Link from "next/link";

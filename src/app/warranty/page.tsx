@@ -5,7 +5,8 @@ import { useState, useEffect, useContext } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../types/supabase";
 import moment from "moment";
-type Warranty = Database["public"]["Tables"]["warranties"]["Row"] & { order_id: { address?: string } };
+type Warranty = Database["public"]["Tables"]["warranties"]["Row"];
+// type Warranty = Database["public"]["Tables"]["warranties"]["Row"] & { order_id: { address?: string } };
 import NewWarrantyModal from "./addWarrenty.modal";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -56,7 +57,7 @@ export default function Page() {
               <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={item.id}>
                 <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">{item.id}</Table.Cell>
                 <Table.Cell>{item.name}</Table.Cell>
-                <Table.Cell>{item.order_id?.address}</Table.Cell>
+                {/* <Table.Cell>{item.order_id?.address}</Table.Cell> */}
                 <Table.Cell>
                   <TimeLeft start_date={item.start_date} period={item.period} />
                 </Table.Cell>

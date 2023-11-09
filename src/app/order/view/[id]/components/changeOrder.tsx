@@ -1,7 +1,7 @@
 import { Button, Card, Toast, Table, Tabs } from "flowbite-react";
 import { useState, useRef, useContext } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Database } from "../../../../../types/supabase";
+import { Database } from "../../../../../../types/supabase";
 import { UserContext } from "@/context/userContext";
 import { useRouter } from "next/navigation";
 import { MergeProductsbyKey, numberWithCommas } from "@/utils/commonUtils";

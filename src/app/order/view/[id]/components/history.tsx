@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Database } from "../../../../../types/supabase";
+import { Database } from "../../../../../../types/supabase";
 import moment from "moment";
 type Product = Database["public"]["Tables"]["products"]["Row"];
 type Order = Database["public"]["Tables"]["orders"]["Row"];
@@ -8,7 +8,7 @@ type OrderArray = [Order];
 import { Button, Checkbox, Label, Modal, TextInput, Select, Textarea, Timeline } from "flowbite-react";
 import { useRouter } from "next/navigation";
 import { BsArrowUpShort, BsArrowDownShort } from "react-icons/bs";
-import DownloadPDF from "../../downloadPDF";
+import DownloadPDF from "../../../downloadPDF";
 
 export default function History({ order }: { order: Order }) {
   const rootRef = useRef<HTMLDivElement>(null);

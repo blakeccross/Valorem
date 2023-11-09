@@ -45,6 +45,30 @@ export interface Database {
         }
         Relationships: []
       }
+      "catalog-pricing": {
+        Row: {
+          created_at: string
+          homedepot_price: number | null
+          id: number
+          lowes_price: number | null
+          sku: string | null
+        }
+        Insert: {
+          created_at?: string
+          homedepot_price?: number | null
+          id?: number
+          lowes_price?: number | null
+          sku?: string | null
+        }
+        Update: {
+          created_at?: string
+          homedepot_price?: number | null
+          id?: number
+          lowes_price?: number | null
+          sku?: string | null
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           address: string | null
@@ -81,7 +105,7 @@ export interface Database {
       orders: {
         Row: {
           address: string | null
-          changeOrder: boolean
+          change_order: boolean
           closed: string | null
           cost: number | null
           created_at: string | null
@@ -101,7 +125,7 @@ export interface Database {
         }
         Insert: {
           address?: string | null
-          changeOrder?: boolean
+          change_order?: boolean
           closed?: string | null
           cost?: number | null
           created_at?: string | null
@@ -121,7 +145,7 @@ export interface Database {
         }
         Update: {
           address?: string | null
-          changeOrder?: boolean
+          change_order?: boolean
           closed?: string | null
           cost?: number | null
           created_at?: string | null
@@ -143,6 +167,7 @@ export interface Database {
           {
             foreignKeyName: "orders_order_id_fkey"
             columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           }
@@ -177,6 +202,7 @@ export interface Database {
           {
             foreignKeyName: "product-confirm_event_fkey"
             columns: ["event"]
+            isOneToOne: false
             referencedRelation: "events"
             referencedColumns: ["id"]
           }
@@ -217,6 +243,7 @@ export interface Database {
           {
             foreignKeyName: "products_orderId_fkey"
             columns: ["orderId"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           }
@@ -262,8 +289,8 @@ export interface Database {
           id: number
           link: string | null
           name: string | null
-          order_id: number | null
           period: number | null
+          product_id: number | null
           start_date: string | null
         }
         Insert: {
@@ -272,8 +299,8 @@ export interface Database {
           id?: number
           link?: string | null
           name?: string | null
-          order_id?: number | null
           period?: number | null
+          product_id?: number | null
           start_date?: string | null
         }
         Update: {
@@ -282,21 +309,23 @@ export interface Database {
           id?: number
           link?: string | null
           name?: string | null
-          order_id?: number | null
           period?: number | null
+          product_id?: number | null
           start_date?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "warranties_contractor_id_fkey"
             columns: ["contractor_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "warranties_order_id_fkey"
-            columns: ["order_id"]
-            referencedRelation: "orders"
+            foreignKeyName: "warranties_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           }
         ]
@@ -314,6 +343,16 @@ export interface Database {
         }
         Returns: {
           dist_meters: number
+        }[]
+      }
+      get_order_by_id: {
+        Args: {
+          order_id: number
+        }
+        Returns: {
+          id: number
+          customer_id: number
+          order_date: string
         }[]
       }
     }

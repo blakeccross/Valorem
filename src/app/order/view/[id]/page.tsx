@@ -1,16 +1,16 @@
 "use client";
 
-import { Button, Spinner } from "flowbite-react";
+import { Banner, Button, Spinner } from "flowbite-react";
 import { useState, useEffect, useRef, useContext } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Database } from "../../../../types/supabase";
+import { Database } from "../../../../../types/supabase";
 import moment from "moment";
 import NewProductModal from "./components/newProduct.modal";
 import ApproveCOModal from "./components/approve.modal";
 import { UserContext } from "@/context/userContext";
 import { useRouter } from "next/navigation";
 import { MdClose, MdDashboard, MdCheck } from "react-icons/md";
-import { HiAdjustments, HiClipboardList, HiUserCircle } from "react-icons/hi";
+import { PiWarningOctagonDuotone } from "react-icons/pi";
 import { BiHistory } from "react-icons/bi";
 import ConfirmationModal from "@/components/confirmation.modal";
 import OrderTimeLine from "./components/timeLine";
@@ -199,132 +199,36 @@ export default function Page({ params }: { params: { id: string } }) {
   if (order && user)
     return (
       <section className="p-5">
-        <ul className="hidden text-sm font-medium text-center text-gray-500 divide-x divide-gray-200 rounded-lg shadow sm:flex dark:divide-gray-700 dark:text-gray-400">
-          <li className="w-full cursor-pointer">
-            <div
-              onClick={() => handleTabChange("details")}
-              className={`flex items-center justify-center gap-3 w-full p-4 rounded-l-lg hover:text-gray-700 hover:bg-gray-50 focus:ring-4 focus:ring-blue-300 dark:hover:text-white dark:hover:bg-gray-700 ${
-                selectedTab === "details"
-                  ? "text-gray-700 dark:text-white dark:bg-gray-700 focus:outline-none bg-gray-100"
-                  : "dark:bg-gray-800 bg-white"
-              }`}
-              aria-current="page"
-            >
-              <MdDashboard size={20} />
-              Details
+        <Banner className=" mb-10">
+          <div className="flex-col justify-between rounded-lg border border-gray-100 bg-amber-300 p-4 shadow-sm dark:border-gray-600 dark:bg-gray-700 md:flex-row lg:max-w-7xl">
+            <div className="mb-3 mr-4 flex flex-col items-start md:mb-0 md:flex-row md:items-center">
+              <p className="flex items-center text-sm font-normal text-gray-800 dark:text-gray-400 gap-4">
+                <PiWarningOctagonDuotone size={25} /> This page is view only. To modify an existing order go to the orders page.
+              </p>
             </div>
-          </li>
-          <li className="w-full cursor-pointer">
-            <div
-              onClick={() => handleTabChange("warranties")}
-              className={`flex items-center justify-center gap-3 w-full p-4 hover:text-gray-700 hover:bg-gray-50 focus:ring-4 focus:ring-blue-300 dark:hover:text-white dark:hover:bg-gray-700 ${
-                selectedTab === "warranties"
-                  ? "text-gray-700 dark:text-white dark:bg-gray-700 focus:outline-none bg-gray-100"
-                  : "dark:bg-gray-800 bg-white"
-              }`}
-            >
-              <HiClipboardList size={20} />
-              Warranties
-            </div>
-          </li>
-          <li className="w-full cursor-pointer">
-            <div
-              onClick={() => handleTabChange("history")}
-              className={`flex items-center justify-center gap-3 w-full p-4 hover:text-gray-700 hover:bg-gray-50 focus:ring-4 focus:ring-blue-300 dark:hover:text-white dark:hover:bg-gray-700 ${
-                selectedTab === "history"
-                  ? "text-gray-700 dark:text-white dark:bg-gray-700 focus:outline-none bg-gray-100"
-                  : "dark:bg-gray-800 bg-white"
-              }`}
-            >
-              <BiHistory size={20} />
-              History
-            </div>
-          </li>
-          <li className="w-full cursor-pointer">
-            <div
-              onClick={() => handleTabChange("settings")}
-              className={`flex items-center justify-center gap-3 w-full p-4 rounded-r-lg hover:text-gray-700 hover:bg-gray-50 focus:ring-4 focus:ring-blue-300 dark:hover:text-white dark:hover:bg-gray-700 ${
-                selectedTab === "settings"
-                  ? "text-gray-700 dark:text-white dark:bg-gray-700 focus:outline-none bg-gray-100"
-                  : "dark:bg-gray-800 bg-white"
-              }`}
-            >
-              <HiAdjustments size={20} />
-              Settings
-            </div>
-          </li>
-        </ul>
-        {selectedTab === "details" && (
-          <section className="p-5">
-            <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">{order.project_name}</h1>
-            <p className="mb-2 text-sm text-gray-900 dark:text-white">
-              <b>Date Created: </b>
-              {moment(order.created_at).format("MMMM DD, YYYY HH:mm a")}
-            </p>
-            <p className="mb-2 text-sm text-gray-900 dark:text-white">
-              <b>Address: </b>
-              {order.address}
-            </p>
-            {user.role !== "contractor" && order?.change_order && (
-              <div className="flex flex-row justify-end gap-4 mt-4">
-                <Button outline color="red" className="h-fit">
-                  <MdClose size={20} />
-                  Deny Changes
-                </Button>
-                <ApproveCOModal showModal={showApproveModal} setShowModal={setShowApproveModal} reload={getOrders} id={Number(params.id)} />
-              </div>
-            )}
-            {order && <OrderTimeLine order={order} />}
+            <div className="flex flex-shrink-0 items-center"></div>
+          </div>
+        </Banner>
+        <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">{order.project_name}</h1>
+        <p className="mb-2 text-sm text-gray-900 dark:text-white">
+          <b>Date Created: </b>
+          {moment(order.created_at).format("MMMM DD, YYYY HH:mm a")}
+        </p>
+        <p className="mb-2 text-sm text-gray-900 dark:text-white">
+          <b>Address: </b>
+          {order.address}
+        </p>
+        {order && <OrderTimeLine order={order} />}
 
-            {!order.change_order && (
-              <div className="flex justify-end mb-5 gap-4">
-                <CSVSelector
-                  showModal={showUploadModal}
-                  setShowModal={setShowUploadModal}
-                  orderId={Number(params.id)}
-                  addProduct={(newProduct) => {
-                    setAddedProducts([...addedProducts, ...newProduct]), setShowSubmitButton(true);
-                  }}
-                />
-                <NewProductModal
-                  showModal={showModal}
-                  setShowModal={setShowModal}
-                  addProduct={(newProduct) => {
-                    setAddedProducts([...addedProducts, newProduct]), setShowSubmitButton(true);
-                  }}
-                  orderId={Number(params.id)}
-                />
-                {showSubmitButton && (
-                  <Button className="h-fit" onClick={() => setShowSubmitConfirmation(true)}>
-                    <MdCheck size={20} />
-                    Submit Changes
-                  </Button>
-                )}
-                <ConfirmationModal
-                  title="Submit Order?"
-                  description="Are you sure you would like to submit updates to this order?"
-                  showModal={showSubmitConfirmation}
-                  setShowModal={setShowSubmitConfirmation}
-                  handleConfirm={createChangeOrder}
-                  handleCancel={() => setShowSubmitConfirmation(false)}
-                />
-              </div>
-            )}
-            {productsLoading ? (
-              <div className="flex justify-center items-center">
-                <Spinner aria-label="Loading" size="xl" />
-              </div>
-            ) : order.change_order ? (
-              <ChangeOrder products={products} />
-            ) : (
-              <ActiveOrder products={[...products, ...addedProducts]} />
-            )}
-          </section>
+        {productsLoading ? (
+          <div className="flex justify-center items-center">
+            <Spinner aria-label="Loading" size="xl" />
+          </div>
+        ) : order.change_order ? (
+          <ChangeOrder products={products} />
+        ) : (
+          <ActiveOrder products={[...products, ...addedProducts]} />
         )}
-
-        {selectedTab === "warranties" && <Warranties products={products} />}
-        {selectedTab === "history" && <History order={order} />}
-        {selectedTab === "settings" && <Settings order={order} />}
       </section>
     );
 }
