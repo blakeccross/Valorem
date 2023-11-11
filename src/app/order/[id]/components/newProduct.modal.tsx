@@ -54,7 +54,15 @@ export default function NewProductModal({
   // }
 
   function handleAddProduct() {
-    let product = { description: description, quantity: quantity, price: price || 0, size: size, type: category || "", orderId: orderId };
+    let product = {
+      description: description,
+      quantity: quantity,
+      price: price || 0,
+      size: size,
+      type: category || "",
+      orderId: orderId,
+      status: "new",
+    };
     addProduct(product);
     setShowModal(false);
   }

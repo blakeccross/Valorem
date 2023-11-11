@@ -40,7 +40,7 @@ export default function ChangeOrder({ products }: { products: Product[] }) {
                       `dark:border-gray-700 dark:bg-gray-800 ` +
                       ((product.status === "updated" && ` bg-amber-200 dark:bg-amber-800`) ||
                         (product.status === "removed" && ` bg-red-200 dark:bg-red-800`) ||
-                        (product.status === "new" && ` bg-lime-200 dark:bg-lime-800`))
+                        (product.status === "new" && ` bg-green-200 dark:bg-green-800`))
                     }
                   >
                     <Table.Cell className="font-medium text-gray-900 dark:text-white max-w-xs">{product.description}</Table.Cell>

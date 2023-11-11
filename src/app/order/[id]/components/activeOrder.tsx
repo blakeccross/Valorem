@@ -24,7 +24,7 @@ export default function ActiveOrder({ products }: { products: Product[] }) {
   const { user, SignOut } = useContext(UserContext);
   const router = useRouter();
   const productSortedByType = MergeProductsbyKey(products, "type");
-
+  console.log(products);
   return (
     <div>
       <div className="flex flex-col flex-1 gap-4">
@@ -42,7 +42,12 @@ export default function ActiveOrder({ products }: { products: Product[] }) {
                 {item.map((product) => (
                   <Table.Body className="divide-y" key={product.id}>
                     <Table.Row
-                      className={`dark:border-gray-700 dark:bg-gray-800 ` + (product.status === "updated" && ` bg-amber-200 dark:bg-amber-800`)}
+                      className={
+                        `dark:border-gray-700 dark:bg-gray-800 ` +
+                        ((product.status === "updated" && ` bg-amber-200 dark:bg-amber-800`) ||
+                          (product.status === "removed" && ` bg-red-200 dark:bg-red-800`) ||
+                          (product.status === "new" && ` bg-green-200 dark:bg-green-800`))
+                      }
                     >
                       <Table.Cell className="font-medium text-gray-900 dark:text-white">
                         <p>{product.description}</p>

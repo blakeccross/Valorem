@@ -1,6 +1,6 @@
 "use client";
 
-import { Timeline, Table, Badge, Dropdown, Button } from "flowbite-react";
+import { Timeline, Table, Badge, Dropdown, Label, TextInput, Spinner } from "flowbite-react";
 import { useState, useEffect, useRef, Fragment, useContext } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../types/supabase";
@@ -10,23 +10,26 @@ type OrderArray = [Order];
 import NewOrderModal from "./newOrder.modal";
 import Link from "next/link";
 import { MergeProductsbyKey } from "@/utils/commonUtils";
-import { AiOutlineCloudDownload, AiOutlineExclamationCircle } from "react-icons/ai";
-import { BiSolidChevronUp, BiSolidChevronDown, BiDotsVerticalRounded } from "react-icons/bi";
+import { BiSolidChevronUp, BiSolidChevronDown, BiDotsVerticalRounded, BiFilterAlt } from "react-icons/bi";
 import DownloadPDF from "./downloadPDF";
-import dynamic from "next/dynamic";
 import { TfiAngleDown, TfiAngleUp } from "react-icons/tfi";
 import { HiCheck, HiClock } from "react-icons/hi";
 import ConfirmationModal from "@/components/confirmation.modal";
 import EditOrderModal from "./editOrder.modal";
 import { useRouter } from "next/navigation";
-import { BsArrowUpShort, BsArrowDownShort, BsCalendar, BsPlus } from "react-icons/bs";
+import { BsArrowUpShort, BsArrowDownShort, BsPlus } from "react-icons/bs";
+import { BiSortDown } from "react-icons/bi";
 import { UserContext } from "@/context/userContext";
+import Loading from "../loading";
 
 export default function ClientView() {
   const supabase = createClientComponentClient<Database>();
   const [orders, setOrders] = useState<OrderArray[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [tableIsLoading, setTableIsLoading] = useState<boolean>(false);
+  const [searchInput, setSearchInput] = useState<string>("");
+  const [sortBy, setSortBy] = useState<"project_name" | "start_date">("project_name");
   const [showEditOrderModal, setShowEditOrderModal] = useState<boolean>(false);
   const selectedOrder = useRef<Order | null>(null);
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState<boolean>(false);
@@ -36,7 +39,7 @@ export default function ClientView() {
 
   useEffect(() => {
     getOrders();
-  }, []);
+  }, [sortBy, searchInput]);
 
   useEffect(() => {
     if (orders.length !== 0) {
@@ -45,11 +48,19 @@ export default function ClientView() {
   }, [orders]);
 
   async function getOrders() {
-    let { data: orders, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
-    if (orders) {
-      setOrders(MergeProductsbyKey(orders, "order_id"));
-      console.log(MergeProductsbyKey(orders, "order_id"));
-    }
+    setTableIsLoading(true);
+    let searchOrders = supabase.from("orders").select("*").order(sortBy, { ascending: true });
+    if (searchInput) searchOrders.textSearch("project_name", searchInput);
+
+    await searchOrders.then(({ data: orders, error }) => {
+      if (error) {
+        console.error(error);
+      }
+      if (orders) {
+        setOrders(MergeProductsbyKey(orders, "order_id"));
+      }
+    });
+    setTableIsLoading(false);
   }
 
   async function getProducts() {
@@ -132,134 +143,155 @@ export default function ClientView() {
         <h5 className="mb-2 text-4xl font-bold text-gray-900 dark:text-white">{user?.role === "client" ? "Ongoing orders" : "Active Orders"}</h5>
         {user?.role === "client" && <NewOrderModal showModal={showModal} setShowModal={setShowModal} />}
       </div>
-      <Table striped>
-        <Table.Head>
-          <Table.HeadCell></Table.HeadCell>
-          <Table.HeadCell>Order ID</Table.HeadCell>
-          <Table.HeadCell>Project Name</Table.HeadCell>
-          <Table.HeadCell>Starting Date</Table.HeadCell>
-          <Table.HeadCell>Address</Table.HeadCell>
-          <Table.HeadCell>Status</Table.HeadCell>
-          {user?.role === "client" && <Table.HeadCell></Table.HeadCell>}
-          <Table.HeadCell className="w-1">
-            <span className="sr-only">View Order</span>
-          </Table.HeadCell>
-        </Table.Head>
-        <Table.Body className="divide-y">
-          {orders.map((order: OrderArray) => (
-            <Fragment key={order[0].id}>
-              <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={order[0].id}>
-                <Table.Cell className="p-4 cursor-pointer">
-                  {viewHistory === order[0].id ? (
-                    <TfiAngleUp size={18} onClick={() => setViewHistory(null)} />
-                  ) : (
-                    <TfiAngleDown size={18} onClick={() => setViewHistory(order[0].id)} />
+
+      <div className="flex gap-4">
+        <TextInput placeholder="Search" onChange={(e) => setSearchInput(e.target.value)} value={searchInput} className="w-60" />
+
+        <Dropdown label={<BiSortDown size={17} />} arrowIcon={false} color="white">
+          <Dropdown.Header>
+            <strong>Sort By</strong>
+          </Dropdown.Header>
+          <Dropdown.Item onClick={() => setSortBy("project_name")}>Project Name</Dropdown.Item>
+          <Dropdown.Item onClick={() => setSortBy("start_date")}>Starting Date</Dropdown.Item>
+        </Dropdown>
+      </div>
+      {tableIsLoading ? (
+        <div className=" ml-auto mr-auto mt-72 text-center">
+          <Spinner size="xl" />
+        </div>
+      ) : (
+        <Table striped>
+          <Table.Head>
+            <Table.HeadCell></Table.HeadCell>
+            <Table.HeadCell>Order ID</Table.HeadCell>
+            <Table.HeadCell>Project Name</Table.HeadCell>
+            <Table.HeadCell>Starting Date</Table.HeadCell>
+            <Table.HeadCell>Address</Table.HeadCell>
+            <Table.HeadCell>Status</Table.HeadCell>
+            {user?.role === "client" && <Table.HeadCell></Table.HeadCell>}
+            <Table.HeadCell className="w-1">
+              <span className="sr-only">View Order</span>
+            </Table.HeadCell>
+          </Table.Head>
+          <Table.Body className="divide-y">
+            {orders.map((order: OrderArray) => (
+              <Fragment key={order[0].id}>
+                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={order[0].id}>
+                  <Table.Cell className="p-4 cursor-pointer">
+                    {viewHistory === order[0].id ? (
+                      <TfiAngleUp size={18} onClick={() => setViewHistory(null)} />
+                    ) : (
+                      <TfiAngleDown size={18} onClick={() => setViewHistory(order[0].id)} />
+                    )}
+                  </Table.Cell>
+                  <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">{order[0].order_id}</Table.Cell>
+                  <Table.Cell>{order[0].project_name}</Table.Cell>
+                  <Table.Cell>{moment(order[0].start_date).format("MMMM DD, YYYY")}</Table.Cell>
+                  <Table.Cell className="truncate">{order[0].address}</Table.Cell>
+                  <Table.Cell>
+                    <OrderStatus status={order[0].status || ""} />
+                  </Table.Cell>
+                  <Table.Cell className="w-32">
+                    <Link
+                      className="font-medium text-cyan-600 hover:underline dark:text-cyan-500 text-center"
+                      href={{ pathname: `/order/${encodeURIComponent(order[0].id)}`, query: { orderId: order[0].order_id } }}
+                    >
+                      <p>{!order[0].change_order ? "View Order" : "View CO"}</p>
+                    </Link>
+                  </Table.Cell>
+                  {user?.role === "client" && (
+                    <Table.Cell className="">
+                      <div className="relative cursor-pointer">
+                        <Dropdown renderTrigger={() => <BiDotsVerticalRounded size={25} />} label="" className="!left-[-50px] !top-6">
+                          <Dropdown.Item
+                            onClick={() => {
+                              selectedOrder.current = order[0];
+                              setShowEditOrderModal(true);
+                            }}
+                          >
+                            Edit
+                          </Dropdown.Item>
+                          <Dropdown.Item onClick={() => router.push(`/order/${order[0].id}?orderId=${order[0].order_id}`)}>View</Dropdown.Item>
+                          <Dropdown.Item
+                            onClick={() => {
+                              setShowDeleteConfirmModal(true);
+                              selectedOrder.current = order[0];
+                            }}
+                          >
+                            Delete
+                          </Dropdown.Item>
+                        </Dropdown>
+                      </div>
+                    </Table.Cell>
                   )}
-                </Table.Cell>
-                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">{order[0].order_id}</Table.Cell>
-                <Table.Cell>{order[0].project_name}</Table.Cell>
-                <Table.Cell>{moment(order[0].created_at).format("MMMM DD, YYYY")}</Table.Cell>
-                <Table.Cell className="truncate">{order[0].address}</Table.Cell>
-                <Table.Cell>
-                  <OrderStatus status={order[0].status || ""} />
-                </Table.Cell>
-                <Table.Cell className="w-32">
-                  <Link
-                    className="font-medium text-cyan-600 hover:underline dark:text-cyan-500 text-center"
-                    href={{ pathname: `/order/${encodeURIComponent(order[0].id)}`, query: { orderId: order[0].order_id } }}
-                  >
-                    <p>{!order[0].change_order ? "View Order" : "View CO"}</p>
-                  </Link>
-                </Table.Cell>
-                {user?.role === "client" && (
-                  <Table.Cell className="">
-                    <div className="relative cursor-pointer">
-                      <Dropdown renderTrigger={() => <BiDotsVerticalRounded size={25} />} label="" className="!left-[-50px] !top-6">
-                        <Dropdown.Item
-                          onClick={() => {
-                            selectedOrder.current = order[0];
-                            setShowEditOrderModal(true);
-                          }}
-                        >
-                          Edit
-                        </Dropdown.Item>
-                        <Dropdown.Item onClick={() => router.push(`/order/${order[0].id}?orderId=${order[0].order_id}`)}>View</Dropdown.Item>
-                        <Dropdown.Item
-                          onClick={() => {
-                            setShowDeleteConfirmModal(true);
-                            selectedOrder.current = order[0];
-                          }}
-                        >
-                          Delete
-                        </Dropdown.Item>
-                      </Dropdown>
+                </Table.Row>
+                {viewHistory === order[0].id && (
+                  <Table.Cell colSpan={8}>
+                    <div className="p-4">
+                      <h5 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">Order history</h5>
+
+                      <Timeline>
+                        {[...order]
+                          .reverse()
+                          .slice(0, 3)
+                          .map((co, index, array) => (
+                            <Timeline.Item key={co.id}>
+                              <Timeline.Point />
+                              <Timeline.Content>
+                                <div className="flex flex-row justify-between">
+                                  <div>
+                                    <Timeline.Time>{moment(co.created_at).format("MMMM DD, YYYY")}</Timeline.Time>
+                                    <Timeline.Title>
+                                      <a
+                                        className="hover:underline cursor-pointer"
+                                        onClick={() => router.push(`/order/view/${co.id}?orderId=${co.order_id}`)}
+                                      >
+                                        {co.order_id + "-" + (order.length - index)}
+                                      </a>
+                                      <span className="flex flex-row text-sm">
+                                        <p className="flex gap-1">
+                                          <p>Total:</p>${co.cost}
+                                        </p>
+                                        <PriceChangeStatus currentItem={co?.cost} previousItem={array[index + 1]?.cost} />
+                                      </span>
+                                      <p className="text-sm">
+                                        {"Items: "}
+                                        {products.reduce((count, product) => {
+                                          if (product.orderId === co.id) {
+                                            return count + 1;
+                                          }
+                                          return count;
+                                        }, 0)}
+                                      </p>
+                                    </Timeline.Title>
+                                  </div>
+                                  <DownloadPDF orderId={co.id} id={co.id} />
+                                </div>
+                              </Timeline.Content>
+                            </Timeline.Item>
+                          ))}
+                      </Timeline>
+                      {order.length > 3 && (
+                        <div className="flex justify-center items-center">
+                          <Link
+                            className="font-medium text-cyan-600 hover:underline dark:text-cyan-500 text-center"
+                            href={{
+                              pathname: `/order/${encodeURIComponent(order[0].id)}`,
+                              query: { orderId: order[0].id, view: "history" },
+                            }}
+                          >
+                            View More
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   </Table.Cell>
                 )}
-              </Table.Row>
-              {viewHistory === order[0].id && (
-                <Table.Cell colSpan={8}>
-                  <div className="p-4">
-                    <h5 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">Order history</h5>
-
-                    <Timeline>
-                      {[...order].slice(0, 3).map((co, index, array) => (
-                        <Timeline.Item key={co.id}>
-                          <Timeline.Point />
-                          <Timeline.Content>
-                            <div className="flex flex-row justify-between">
-                              <div>
-                                <Timeline.Time>{moment(co.created_at).format("MMMM DD, YYYY")}</Timeline.Time>
-                                <Timeline.Title>
-                                  <a
-                                    className="hover:underline cursor-pointer"
-                                    onClick={() => router.push(`/order/view/${co.id}?orderId=${co.order_id}`)}
-                                  >
-                                    {co.order_id + "-" + (order.length - index)}
-                                  </a>
-                                  <span className="flex flex-row text-sm">
-                                    <p className="flex gap-1">
-                                      <p>Total:</p>${co.cost}
-                                    </p>
-                                    <PriceChangeStatus currentItem={co?.cost} previousItem={array[index + 1]?.cost} />
-                                  </span>
-                                  <p className="text-sm">
-                                    {"Items: "}
-                                    {products.reduce((count, product) => {
-                                      if (product.orderId === co.id) {
-                                        return count + 1;
-                                      }
-                                      return count;
-                                    }, 0)}
-                                  </p>
-                                </Timeline.Title>
-                              </div>
-                              <DownloadPDF orderId={co.id} id={co.id} />
-                            </div>
-                          </Timeline.Content>
-                        </Timeline.Item>
-                      ))}
-                    </Timeline>
-                    {order.length > 3 && (
-                      <div className="flex justify-center items-center">
-                        <Link
-                          className="font-medium text-cyan-600 hover:underline dark:text-cyan-500 text-center"
-                          href={{
-                            pathname: `/order/${encodeURIComponent(order[0].id)}`,
-                            query: { orderId: order[0].id, view: "history" },
-                          }}
-                        >
-                          View More
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                </Table.Cell>
-              )}
-            </Fragment>
-          ))}
-        </Table.Body>
-      </Table>
+              </Fragment>
+            ))}
+          </Table.Body>
+        </Table>
+      )}
       <ConfirmationModal
         showModal={showDeleteConfirmModal}
         setShowModal={setShowDeleteConfirmModal}
