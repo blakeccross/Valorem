@@ -80,7 +80,9 @@ export default function History({ order }: { order: Order }) {
                 <div>
                   <Timeline.Time>{moment(co.created_at).format("MMMM DD, YYYY")}</Timeline.Time>
                   <Timeline.Title>
-                    {co.order_id + "-" + (orders.length - index)}
+                    <a className="hover:underline cursor-pointer" onClick={() => router.push(`/order/view/${co.id}?orderId=${co.order_id}`)}>
+                      {co.order_id + "-" + (orders.length - index)}
+                    </a>
                     <span className="flex flex-row text-sm">
                       <p className="flex gap-1">
                         <p>Total:</p>${co.cost}

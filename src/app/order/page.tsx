@@ -57,7 +57,6 @@ export default function ClientView() {
         console.error(error);
       }
       if (orders) {
-        console.log(MergeOrdersbyKey(orders, "order_id"));
         setOrders(MergeOrdersbyKey(orders, "order_id"));
       }
     });

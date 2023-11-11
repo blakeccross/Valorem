@@ -25,8 +25,12 @@ export default function Settings({ order }: { order: Order }) {
       setAddress(order.address || "");
       setDescription(order.description || "");
       setTrade(order.trade || "");
-
-      const geometry = wkx.Geometry.parse(Buffer.from(String(order.location), "hex"));
+      let geometry: any;
+      try {
+        geometry = wkx.Geometry.parse(Buffer.from(String(order.location), "hex"));
+      } catch {
+        geometry = "";
+      }
       if (geometry instanceof wkx.Point) {
         setLocation({ lat: geometry.x, long: geometry.y });
       } else {
