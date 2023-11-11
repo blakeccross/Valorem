@@ -5,7 +5,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../types/supabase";
 import moment from "moment";
 type Order = Database["public"]["Tables"]["orders"]["Row"];
-import { Button, Checkbox, Label, Modal, TextInput, Select, Textarea } from "flowbite-react";
+import { Button, Checkbox, Label, Modal, TextInput, Select, Textarea, Datepicker } from "flowbite-react";
 import { usePlacesWidget } from "react-google-autocomplete";
 import Autocomplete from "react-google-autocomplete";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,7 @@ export default function NewOrderModal({ showModal, setShowModal }: { showModal: 
   const [address, setAddress] = useState<string>("");
   const [location, setLocation] = useState<any>({ lat: "", long: "" });
   const [trade, setTrade] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>(new Date().toDateString());
   const [size, setSize] = useState<number>(0);
   const [description, setDescription] = useState<string>("");
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function NewOrderModal({ showModal, setShowModal }: { showModal: 
       .insert([
         {
           project_name: name,
-          start_date: null,
+          start_date: startDate,
           address: address,
           location: `POINT(${location.lat} ${location.long})`,
           description: description,
@@ -76,7 +77,7 @@ export default function NewOrderModal({ showModal, setShowModal }: { showModal: 
             </div>
             <div>
               <Label>Project Name</Label>
-              <TextInput id="name" required value={name} onChange={(e) => setName(e.target.value)} />
+              <TextInput id="name" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter a name" />
             </div>
             <div>
               <Label htmlFor="email">Address</Label>
@@ -93,6 +94,11 @@ export default function NewOrderModal({ showModal, setShowModal }: { showModal: 
                   componentRestrictions: { country: "us" },
                 }}
               />
+            </div>
+            <div>
+              <Label>Start Date</Label>
+              <Datepicker onSelectedDateChanged={(e) => setStartDate(e.toDateString())} value={startDate} />
+              {/* <TextInput id="name" required value={name} onChange={(e) => setName(e.target.value)} /> */}
             </div>
             <div>
               <Label>Main Sqft</Label>

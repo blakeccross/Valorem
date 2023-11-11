@@ -9,7 +9,7 @@ type Order = Database["public"]["Tables"]["orders"]["Row"];
 type OrderArray = [Order];
 import NewOrderModal from "./newOrder.modal";
 import Link from "next/link";
-import { MergeProductsbyKey } from "@/utils/commonUtils";
+import { MergeOrdersbyKey } from "@/utils/commonUtils";
 import { BiSolidChevronUp, BiSolidChevronDown, BiDotsVerticalRounded, BiFilterAlt } from "react-icons/bi";
 import DownloadPDF from "./downloadPDF";
 import { TfiAngleDown, TfiAngleUp } from "react-icons/tfi";
@@ -57,7 +57,8 @@ export default function ClientView() {
         console.error(error);
       }
       if (orders) {
-        setOrders(MergeProductsbyKey(orders, "order_id"));
+        console.log(MergeOrdersbyKey(orders, "order_id"));
+        setOrders(MergeOrdersbyKey(orders, "order_id"));
       }
     });
     setTableIsLoading(false);
@@ -231,45 +232,42 @@ export default function ClientView() {
                       <h5 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">Order history</h5>
 
                       <Timeline>
-                        {[...order]
-                          .reverse()
-                          .slice(0, 3)
-                          .map((co, index, array) => (
-                            <Timeline.Item key={co.id}>
-                              <Timeline.Point />
-                              <Timeline.Content>
-                                <div className="flex flex-row justify-between">
-                                  <div>
-                                    <Timeline.Time>{moment(co.created_at).format("MMMM DD, YYYY")}</Timeline.Time>
-                                    <Timeline.Title>
-                                      <a
-                                        className="hover:underline cursor-pointer"
-                                        onClick={() => router.push(`/order/view/${co.id}?orderId=${co.order_id}`)}
-                                      >
-                                        {co.order_id + "-" + (order.length - index)}
-                                      </a>
-                                      <span className="flex flex-row text-sm">
-                                        <p className="flex gap-1">
-                                          <p>Total:</p>${co.cost}
-                                        </p>
-                                        <PriceChangeStatus currentItem={co?.cost} previousItem={array[index + 1]?.cost} />
-                                      </span>
-                                      <p className="text-sm">
-                                        {"Items: "}
-                                        {products.reduce((count, product) => {
-                                          if (product.orderId === co.id) {
-                                            return count + 1;
-                                          }
-                                          return count;
-                                        }, 0)}
+                        {[...order].slice(0, 3).map((co, index, array) => (
+                          <Timeline.Item key={co.id}>
+                            <Timeline.Point />
+                            <Timeline.Content>
+                              <div className="flex flex-row justify-between">
+                                <div>
+                                  <Timeline.Time>{moment(co.created_at).format("MMMM DD, YYYY")}</Timeline.Time>
+                                  <Timeline.Title>
+                                    <a
+                                      className="hover:underline cursor-pointer"
+                                      onClick={() => router.push(`/order/view/${co.id}?orderId=${co.order_id}`)}
+                                    >
+                                      {co.order_id + "-" + (order.length - index)}
+                                    </a>
+                                    <span className="flex flex-row text-sm">
+                                      <p className="flex gap-1">
+                                        <p>Total:</p>${co.cost}
                                       </p>
-                                    </Timeline.Title>
-                                  </div>
-                                  <DownloadPDF orderId={co.id} id={co.id} />
+                                      <PriceChangeStatus currentItem={co?.cost} previousItem={array[index + 1]?.cost} />
+                                    </span>
+                                    <p className="text-sm">
+                                      {"Items: "}
+                                      {products.reduce((count, product) => {
+                                        if (product.orderId === co.id) {
+                                          return count + 1;
+                                        }
+                                        return count;
+                                      }, 0)}
+                                    </p>
+                                  </Timeline.Title>
                                 </div>
-                              </Timeline.Content>
-                            </Timeline.Item>
-                          ))}
+                                <DownloadPDF orderId={co.id} id={co.id} />
+                              </div>
+                            </Timeline.Content>
+                          </Timeline.Item>
+                        ))}
                       </Timeline>
                       {order.length > 3 && (
                         <div className="flex justify-center items-center">

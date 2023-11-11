@@ -18,6 +18,28 @@ export function MergeProductsbyKey(array: any, key: string) {
   return arrays;
 }
 
+export function MergeOrdersbyKey(array: any, key: string) {
+  const arrays: any = [];
+
+  array.forEach((obj: any) => {
+    let added = false;
+    for (const subArray of arrays) {
+      if (subArray.length > 0 && obj[key] === subArray[0][key]) {
+        subArray.push(obj);
+        // Sort the array by "created_at" after pushing the new object
+        subArray.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        added = true;
+        break;
+      }
+    }
+    if (!added) {
+      arrays.push([obj]);
+    }
+  });
+
+  return arrays;
+}
+
 export function arraysEqual(a: any, b: any) {
   if (a === b) return true;
   if (a == null || b == null) return false;
