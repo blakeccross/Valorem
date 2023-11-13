@@ -286,6 +286,7 @@ export default function Page({ params }: { params: { id: string } }) {
                     setAddedProducts([...addedProducts, ...newProduct]), setShowSubmitButton(true);
                   }}
                 />
+                <Button onClick={() => router.push(`/add-event/${order.id}`)}>+ Add Event</Button>
                 <NewProductModal
                   showModal={showModal}
                   setShowModal={setShowModal}

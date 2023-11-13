@@ -144,7 +144,7 @@ export default function ClientView() {
         {user?.role === "client" && <NewOrderModal showModal={showModal} setShowModal={setShowModal} />}
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex gap-4 mb-4">
         <TextInput placeholder="Search" onChange={(e) => setSearchInput(e.target.value)} value={searchInput} className="w-60" />
 
         <Dropdown label={<BiSortDown size={17} />} arrowIcon={false} color="white">
@@ -160,7 +160,7 @@ export default function ClientView() {
           <Spinner size="xl" />
         </div>
       ) : (
-        <Table striped>
+        <Table striped className="w-full">
           <Table.Head>
             <Table.HeadCell></Table.HeadCell>
             <Table.HeadCell>Order ID</Table.HeadCell>

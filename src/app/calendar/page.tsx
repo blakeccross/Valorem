@@ -8,6 +8,11 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../types/supabase";
 import { calcCrow } from "@/utils/commonUtils";
 type Event = Database["public"]["Tables"]["events"]["Row"];
+type EventWithOrderId = {
+  order_id: {
+    address: string;
+  };
+} & Event;
 import ConfirmationModal from "./confirmation.modal";
 import { useRouter } from "next/navigation";
 
@@ -17,7 +22,7 @@ import SetAvailabiltyModal from "./setAvailability.modal";
 
 export default function Calenda() {
   const supabase = createClientComponentClient<Database>();
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [location, setLocation] = useState<any>(null);
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
@@ -44,7 +49,7 @@ export default function Calenda() {
   }, []);
 
   async function getEvents() {
-    let { data: events, error } = await supabase.from("events").select("*");
+    let { data: events, error } = await supabase.from("events").select("*, order_id(address, location)");
     if (events) {
       setEvents(events);
       console.log(events);
@@ -65,7 +70,7 @@ export default function Calenda() {
         </div>
         <div className="flex flex-col gap-4">
           {events.map((item) => (
-            <>
+            <div key={item.id}>
               <h5 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">{moment(item.date_time).format("MMMM")}</h5>
               <Card>
                 <div className="flex flex-row gap-8 items-center" key={item.id}>
@@ -75,13 +80,14 @@ export default function Calenda() {
                   </div>
 
                   <div className="flex flex-1 flex-col text-left justify-center items-start text-gray-900 dark:text-white">
-                    <p>{item.name}</p>
-                    <b>{moment(item.date_time).format("HH:mm a")}</b>
+                    <p>{item.type}</p>
+                    <b>{moment(item.date_time).format("h:mm a")}</b>
+                    <p>Address: {item.order_id?.address}</p>
                   </div>
                   <Button onClick={() => handleConfirmModal(item)}>Confirm</Button>
                 </div>
               </Card>
-            </>
+            </div>
           ))}
           <ConfirmationModal showModal={showConfirmModal} setShowModal={setShowConfirmModal} event={selectedEvent.current} location={location} />
         </div>
@@ -89,13 +95,3 @@ export default function Calenda() {
     </>
   );
 }
-
-// const locales = {
-//   "en-US": enUS,
-// };
-
-const now = new Date();
-// The types here are `object`. Strongly consider making them better as removing `locales` caused a fatal error
-const localizer = momentLocalizer(moment);
-//@ts-ignore
-const DnDCalendar = withDragAndDrop(Calendar);
