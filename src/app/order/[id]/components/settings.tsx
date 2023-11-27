@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useContext } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../../../types/supabase";
 import moment from "moment";
@@ -8,6 +8,7 @@ import { usePlacesWidget } from "react-google-autocomplete";
 import Autocomplete from "react-google-autocomplete";
 import { useRouter } from "next/navigation";
 import wkx from "wkx";
+import { UserContext } from "@/context/userContext";
 
 export default function Settings({ order }: { order: Order }) {
   const supabase = createClientComponentClient<Database>();
@@ -17,6 +18,8 @@ export default function Settings({ order }: { order: Order }) {
   const [trade, setTrade] = useState<string>("");
   const [size, setSize] = useState<number>(0);
   const [description, setDescription] = useState<string>("");
+  const [accessInstructions, setAccessInstructions] = useState<string>("");
+  const { user } = useContext(UserContext);
   const router = useRouter();
 
   useEffect(() => {
@@ -25,6 +28,7 @@ export default function Settings({ order }: { order: Order }) {
       setAddress(order.address || "");
       setDescription(order.description || "");
       setTrade(order.trade || "");
+      setAccessInstructions(order.access_instructions || "");
       let geometry: any;
       try {
         geometry = wkx.Geometry.parse(Buffer.from(String(order.location), "hex"));
@@ -48,13 +52,14 @@ export default function Settings({ order }: { order: Order }) {
         address: address,
         location: `POINT(${location.lat} ${location.long})`,
         description: description,
+        access_instructions: accessInstructions,
         size: size,
         trade: trade,
       })
       .eq("id", order.id)
       .select();
     if (data) {
-      console.log(data);
+      router.refresh();
     }
     if (error) {
       alert(error.message);
@@ -64,63 +69,77 @@ export default function Settings({ order }: { order: Order }) {
   return (
     <section className="p-5">
       <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">Order Settings</h1>
-      <div>
-        <Label htmlFor="countries">Trade</Label>
-        <Select id="countries" required value={trade} onChange={(e) => setTrade(e.target.value)}>
-          <option disabled></option>
-          <option>Exterior / Landscaping</option>
-          <option>MEP / General</option>
-          <option>Living Room</option>
-          <option>Family Room / Den</option>
-          <option>Dining Room</option>
-          <option>Kitchen / Nook</option>
-          <option>Master Bedroom</option>
-          <option>Applicances</option>
-          <option>Bedroom</option>
-          <option>Laundry Room</option>
-          <option>Garage</option>
-          <option>Flooring</option>
-          <option>Other</option>
-        </Select>
-      </div>
-      <div>
-        <Label>Project Name</Label>
-        <TextInput id="name" required value={name} onChange={(e) => setName(e.target.value)} />
-      </div>
-      <div>
-        <Label htmlFor="email">Address</Label>
-        <Autocomplete
-          apiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY}
-          className="block w-full border disabled:cursor-not-allowed disabled:opacity-50 bg-gray-50 border-gray-300 text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-cyan-500 dark:focus:ring-cyan-500 p-2.5 text-sm rounded-lg"
-          onPlaceSelected={(place) => {
-            setAddress(place.formatted_address);
-            setLocation({ lat: place.geometry.location.lat(), long: place.geometry.location.lng() });
-          }}
-          options={{
-            types: ["address"],
-            componentRestrictions: { country: "us" },
-          }}
-          defaultValue={address}
-        />
-      </div>
-      <div>
-        <Label>Main Sqft</Label>
-        <TextInput required type="number" value={size} onChange={(e) => setSize(e.target.valueAsNumber)} />
-      </div>
-      <div>
-        <Label htmlFor="comment">Description</Label>
-        <Textarea
-          id="comment"
-          placeholder="Please give a detailed description..."
-          required
-          rows={4}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </div>
+      <div className="flex flex-col gap-2">
+        <div>
+          <Label htmlFor="countries">Trade</Label>
+          <Select id="countries" required value={trade} onChange={(e) => setTrade(e.target.value)} disabled={user.role === "contractor"}>
+            <option disabled></option>
+            <option>Exterior / Landscaping</option>
+            <option>MEP / General</option>
+            <option>Living Room</option>
+            <option>Family Room / Den</option>
+            <option>Dining Room</option>
+            <option>Kitchen / Nook</option>
+            <option>Master Bedroom</option>
+            <option>Applicances</option>
+            <option>Bedroom</option>
+            <option>Laundry Room</option>
+            <option>Garage</option>
+            <option>Flooring</option>
+            <option>Other</option>
+          </Select>
+        </div>
+        <div>
+          <Label>Project Name</Label>
+          <TextInput id="name" required value={name} onChange={(e) => setName(e.target.value)} disabled={user.role === "contractor"} />
+        </div>
+        <div>
+          <Label htmlFor="email">Address</Label>
+          <Autocomplete
+            apiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY}
+            className="block w-full border disabled:cursor-not-allowed disabled:opacity-50 bg-gray-50 border-gray-300 text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-cyan-500 dark:focus:ring-cyan-500 p-2.5 text-sm rounded-lg"
+            onPlaceSelected={(place) => {
+              setAddress(place.formatted_address);
+              setLocation({ lat: place.geometry.location.lat(), long: place.geometry.location.lng() });
+            }}
+            options={{
+              types: ["address"],
+              componentRestrictions: { country: "us" },
+            }}
+            defaultValue={address}
+          />
+        </div>
+        <div>
+          <Label>Main Sqft</Label>
+          <TextInput required type="number" value={size} onChange={(e) => setSize(e.target.valueAsNumber)} disabled={user.role === "contractor"} />
+        </div>
+        <div>
+          <Label htmlFor="comment">Access Instructions</Label>
+          <Textarea
+            id="instructions"
+            placeholder="Please give detailed instructions..."
+            required
+            rows={4}
+            value={accessInstructions}
+            onChange={(e) => setAccessInstructions(e.target.value)}
+          />
+        </div>
+        <div>
+          <Label htmlFor="comment">Description</Label>
+          <Textarea
+            id="comment"
+            placeholder="Please give a detailed description..."
+            required
+            rows={4}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            disabled={user.role === "contractor"}
+          />
+        </div>
 
-      <div className="flex justify-end">
-        <Button onClick={handleCreateOrder}>Save</Button>
+        <div className="flex justify-end">
+          <Button onClick={handleCreateOrder}>Save</Button>
+        </div>
       </div>
     </section>
   );

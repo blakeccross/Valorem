@@ -2,6 +2,7 @@
 
 import { Button, Table, Checkbox, Dropdown, Label, TextInput, Spinner } from "flowbite-react";
 import { useState, useEffect, useRef, Fragment, useContext } from "react";
+import { BiSortDown } from "react-icons/bi";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../../types/supabase";
 import moment from "moment";
@@ -14,18 +15,27 @@ export default function ClientView({ params }: { params: { id: string } }) {
   const [order, setOrder] = useState<Order>();
   const [addedProducts, setAddedProducts] = useState<Product[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [searchInput, setSearchInput] = useState<string>("");
+  const [sortBy, setSortBy] = useState<"quantity" | "type">("quantity");
   const [tableIsLoading, setTableIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getProducts();
-  }, []);
+  }, [sortBy, searchInput]);
 
   async function getProducts() {
     setTableIsLoading(true);
-    let { data: products, error } = await supabase.from("products").select("*").eq("orderId", params.id);
-    if (products) {
-      setProducts(products);
-    }
+    let searchProducts = supabase.from("products").select("*").eq("orderId", params.id).order(sortBy, { ascending: true });
+    if (searchInput) searchProducts.textSearch("description", searchInput);
+
+    await searchProducts.then(({ data: products, error }) => {
+      if (error) {
+        console.error(error);
+      }
+      if (products) {
+        setProducts(products);
+      }
+    });
     setTableIsLoading(false);
   }
 
@@ -47,6 +57,17 @@ export default function ClientView({ params }: { params: { id: string } }) {
         </div>
         {addedProducts.length > 0 && <AddEventModal products={addedProducts} orderId={params.id} />}
       </div>
+      <div className="flex gap-4 mb-4">
+        <TextInput placeholder="Search" onChange={(e) => setSearchInput(e.target.value)} value={searchInput} className="w-60" />
+
+        <Dropdown label={<BiSortDown size={17} />} arrowIcon={false} color="white">
+          <Dropdown.Header>
+            <strong>Sort By</strong>
+          </Dropdown.Header>
+          <Dropdown.Item onClick={() => setSortBy("quantity")}>Quantity</Dropdown.Item>
+          <Dropdown.Item onClick={() => setSortBy("type")}>Type</Dropdown.Item>
+        </Dropdown>
+      </div>
       {tableIsLoading ? (
         <div className=" ml-auto mr-auto mt-72 text-center">
           <Spinner size="xl" />
@@ -57,6 +78,7 @@ export default function ClientView({ params }: { params: { id: string } }) {
             <Table.HeadCell className="p-4">{/* <Checkbox onClick={() => setAddedProducts(...addedProducts, )}/> */}</Table.HeadCell>
             <Table.HeadCell>Item Name</Table.HeadCell>
             <Table.HeadCell>Quantity</Table.HeadCell>
+            <Table.HeadCell>Type</Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
             {products.map((item) => (
@@ -72,6 +94,7 @@ export default function ClientView({ params }: { params: { id: string } }) {
                   </Table.Cell>
                   <Table.Cell>{item.description}</Table.Cell>
                   <Table.Cell>{item.quantity}</Table.Cell>
+                  <Table.Cell>{item.type}</Table.Cell>
                 </Table.Row>
               </Fragment>
             ))}

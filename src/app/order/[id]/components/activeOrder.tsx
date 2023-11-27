@@ -24,7 +24,7 @@ export default function ActiveOrder({ products }: { products: Product[] }) {
   const { user, SignOut } = useContext(UserContext);
   const router = useRouter();
   const productSortedByType = MergeProductsbyKey(products, "type");
-  console.log(products);
+
   return (
     <div>
       <div className="flex flex-col flex-1 gap-4">

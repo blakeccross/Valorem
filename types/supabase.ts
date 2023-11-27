@@ -47,63 +47,127 @@ export interface Database {
       }
       "catalog-pricing": {
         Row: {
-          created_at: string
-          homedepot_price: number | null
+          _hd_extract_time: string | null
+          _hd_price: number | null
+          _hd_SKU: string | null
+          _lowes_extract_time: string | null
+          _lowes_price: number | null
+          _lowes_SKU: string | null
           id: number
-          lowes_price: number | null
-          sku: string | null
         }
         Insert: {
-          created_at?: string
-          homedepot_price?: number | null
+          _hd_extract_time?: string | null
+          _hd_price?: number | null
+          _hd_SKU?: string | null
+          _lowes_extract_time?: string | null
+          _lowes_price?: number | null
+          _lowes_SKU?: string | null
           id?: number
-          lowes_price?: number | null
-          sku?: string | null
         }
         Update: {
-          created_at?: string
-          homedepot_price?: number | null
+          _hd_extract_time?: string | null
+          _hd_price?: number | null
+          _hd_SKU?: string | null
+          _lowes_extract_time?: string | null
+          _lowes_price?: number | null
+          _lowes_SKU?: string | null
           id?: number
-          lowes_price?: number | null
-          sku?: string | null
         }
         Relationships: []
       }
       events: {
         Row: {
-          address: string | null
+          contractor_id: string | null
           created_at: string | null
           date_time: string | null
           id: number
           location: unknown | null
           name: string | null
+          order_id: number | null
           type: string | null
-          user_id: number | null
         }
         Insert: {
-          address?: string | null
+          contractor_id?: string | null
           created_at?: string | null
           date_time?: string | null
           id?: number
           location?: unknown | null
           name?: string | null
+          order_id?: number | null
           type?: string | null
-          user_id?: number | null
         }
         Update: {
-          address?: string | null
+          contractor_id?: string | null
           created_at?: string | null
           date_time?: string | null
           id?: number
           location?: unknown | null
           name?: string | null
+          order_id?: number | null
           type?: string | null
-          user_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_contractor_id_fkey"
+            columns: ["contractor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      "Homedepot-PriceHistory": {
+        Row: {
+          created_at: string
+          id: number
+          Price: number | null
+          SKU: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          Price?: number | null
+          SKU?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          Price?: number | null
+          SKU?: string | null
+        }
+        Relationships: []
+      }
+      Lowes_PriceHistory: {
+        Row: {
+          created_at: string
+          id: number
+          Price: number | null
+          SKU: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          Price?: number | null
+          SKU?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          Price?: number | null
+          SKU?: string | null
         }
         Relationships: []
       }
       orders: {
         Row: {
+          access_instructions: string | null
           address: string | null
           change_order: boolean
           closed: string | null
@@ -124,6 +188,7 @@ export interface Database {
           trade: string | null
         }
         Insert: {
+          access_instructions?: string | null
           address?: string | null
           change_order?: boolean
           closed?: string | null
@@ -144,6 +209,7 @@ export interface Database {
           trade?: string | null
         }
         Update: {
+          access_instructions?: string | null
           address?: string | null
           change_order?: boolean
           closed?: string | null
@@ -216,6 +282,7 @@ export interface Database {
           orderId: number | null
           price: number
           quantity: number
+          retail_price: number | null
           size: number | null
           type: string | null
         }
@@ -226,6 +293,7 @@ export interface Database {
           orderId?: number | null
           price: number
           quantity?: number
+          retail_price?: number | null
           size?: number | null
           type?: string | null
         }
@@ -236,6 +304,7 @@ export interface Database {
           orderId?: number | null
           price?: number
           quantity?: number
+          retail_price?: number | null
           size?: number | null
           type?: string | null
         }

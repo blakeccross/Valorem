@@ -27,7 +27,7 @@ export default function AddEventModal({ products, orderId }: { products: Product
           type: type,
           date_time: startDate,
           contractor_id: user.id,
-          order_id: orderId,
+          order_id: Number(orderId),
         },
       ])
       .select()
@@ -48,16 +48,7 @@ export default function AddEventModal({ products, orderId }: { products: Product
         <Modal.Header />
         <Modal.Body>
           <div className="space-y-6">
-            <h3 className="text-xl font-medium text-gray-900 dark:text-white">Schedule Event</h3>
-
-            <div>
-              <Label htmlFor="countries">Date</Label>
-              <Datepicker onSelectedDateChanged={(e) => setStartDate(e.toDateString())} value={startDate} />
-            </div>
-            <div>
-              <Label>Time</Label>
-              <TextInput id="small" type="time" sizing="sm" />
-            </div>
+            <h3 className="text-xl font-medium text-gray-900 dark:text-white">Schedule {type}</h3>
             <div>
               <Label>Type of Event</Label>
               <Select id="type" required value={type} onChange={(e) => setType(e.target.value)}>
@@ -65,6 +56,14 @@ export default function AddEventModal({ products, orderId }: { products: Product
                 <option>Installation</option>
                 <option>Inspection</option>
               </Select>
+            </div>
+            <div>
+              <Label htmlFor="countries">Date</Label>
+              <Datepicker onSelectedDateChanged={(e) => setStartDate(e.toDateString())} value={startDate} />
+            </div>
+            <div>
+              <Label>Time</Label>
+              <TextInput id="small" type="time" sizing="sm" />
             </div>
 
             <div className="flex justify-end">

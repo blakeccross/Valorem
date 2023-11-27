@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Spinner } from "flowbite-react";
+import { Accordion, Button, Spinner, Dropdown } from "flowbite-react";
 import { useState, useEffect, useRef, useContext } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../../types/supabase";
@@ -9,8 +9,10 @@ import NewProductModal from "./components/newProduct.modal";
 import ApproveCOModal from "./components/approve.modal";
 import { UserContext } from "@/context/userContext";
 import { useRouter } from "next/navigation";
-import { MdClose, MdDashboard, MdCheck } from "react-icons/md";
+import { MdClose, MdDashboard, MdCheck, MdOutlineModeEdit } from "react-icons/md";
 import { HiAdjustments, HiClipboardList, HiUserCircle } from "react-icons/hi";
+import { IoEye, IoEyeOff } from "react-icons/io5";
+import { BsThreeDotsVertical } from "react-icons/bs";
 import { BiHistory } from "react-icons/bi";
 import ConfirmationModal from "@/components/confirmation.modal";
 import OrderTimeLine from "./components/timeLine";
@@ -21,11 +23,10 @@ import Settings from "./components/settings";
 import History from "./components/history";
 type Product = Database["public"]["Tables"]["products"]["Row"];
 type Order = Database["public"]["Tables"]["orders"]["Row"];
-type ProductArray = [Product];
 interface COProduct extends Product {
   status: string;
 }
-import { HiCheck } from "react-icons/hi";
+import { calculateTotalPrice } from "@/utils/commonUtils";
 import { useSearchParams } from "next/navigation";
 import CSVSelector from "@/components/csvSelector";
 
@@ -35,6 +36,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [addedProducts, setAddedProducts] = useState<Product[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [showEditMenu, setShowEditMenu] = useState<boolean>(false);
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
   const [showApproveModal, setShowApproveModal] = useState<boolean>(false);
   const [showSubmitConfirmation, setShowSubmitConfirmation] = useState<boolean>(false);
@@ -127,37 +129,28 @@ export default function Page({ params }: { params: { id: string } }) {
     });
 
     setProducts(resultArray);
-
-    // setProducts(MergeProductsbyKey(resultArray, "type"));
   }
 
   async function createChangeOrder() {
-    let formattedProducts = products.map((item) => ({
-      description: item.description,
-      price: item.price,
-      quantity: item.quantity,
-      size: item.size,
-      type: item.type,
-    }));
-    let allProducts = [...formattedProducts, ...addedProducts];
+    // let formattedProducts: Product = products.map((item) => ({
+    //   description: item.description,
+    //   price: item.price,
+    //   quantity: item.quantity,
+    //   size: item.size,
+    //   type: item.type,
+    // }));
+    let allProducts: Product[] = [...products, ...addedProducts];
 
-    let totalCost = allProducts.reduce(function (acc, val) {
-      return acc + val.price;
-    }, 0);
+    let totalCost = calculateTotalPrice(allProducts, "price");
 
     if (order?.id !== order?.order_id || products.length > 0) {
+      type OrderWithoutId = Omit<Order, "id">;
+      const { id, created_at, ...newOrder }: any = order;
       const { data: orderSuccess, error } = await supabase
         .from("orders")
         .insert([
           {
-            project_name: order?.project_name,
-            start_date: null,
-            address: order?.address,
-            location: order?.location,
-            description: order?.description,
-            size: order?.size,
-            trade: order?.trade,
-            order_id: order?.order_id,
+            ...newOrder,
             change_order: true,
             cost: totalCost,
           },
@@ -166,6 +159,7 @@ export default function Page({ params }: { params: { id: string } }) {
         .limit(1)
         .single();
       if (orderSuccess) {
+        // NEED TO ADD RETAIL PRICE
         let allProductsUpdatedId = allProducts.map((item) => ({
           description: item.description,
           price: item.price,
@@ -256,7 +250,32 @@ export default function Page({ params }: { params: { id: string } }) {
         </ul>
         {selectedTab === "details" && (
           <section className="p-5">
-            <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">{order.project_name}</h1>
+            <div className="flex justify-between">
+              <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">{order.project_name}</h1>
+              <Dropdown
+                label=""
+                placement="left-start"
+                renderTrigger={() => (
+                  <span>
+                    <BsThreeDotsVertical size={20} />
+                  </span>
+                )}
+              >
+                <Dropdown.Item onClick={() => setShowEditMenu(!showEditMenu)}>
+                  {showEditMenu ? (
+                    <>
+                      <IoEyeOff size={15} className="mr-2" />
+                      Edit
+                    </>
+                  ) : (
+                    <>
+                      <IoEye size={15} className="mr-2" />
+                      Edit
+                    </>
+                  )}
+                </Dropdown.Item>
+              </Dropdown>
+            </div>
             <p className="mb-2 text-sm text-gray-900 dark:text-white">
               <b>Date Created: </b>
               {moment(order.created_at).format("MMMM DD, YYYY HH:mm a")}
@@ -265,6 +284,26 @@ export default function Page({ params }: { params: { id: string } }) {
               <b>Address: </b>
               {order.address}
             </p>
+
+            <Accordion className=" border-0">
+              <Accordion.Panel>
+                <Accordion.Title className=" hover:bg-transparent border-0 focus:ring-0 bg-transparent px-0">Details</Accordion.Title>
+                <Accordion.Content>
+                  <p className="mb-2 text-sm text-gray-900 dark:text-white">
+                    <strong>Access Instructions:</strong>
+                    <br />
+                    {order.access_instructions}
+                  </p>
+                  <p className="mb-2 text-sm text-gray-900 dark:text-white">
+                    <strong>Allocated Amount: </strong>${calculateTotalPrice(products, "retail_price")}
+                  </p>
+                  <p className="mb-2 text-sm text-gray-900 dark:text-white">
+                    <strong>Aquired Amount: </strong>${calculateTotalPrice(products, "price")}
+                  </p>
+                </Accordion.Content>
+              </Accordion.Panel>
+            </Accordion>
+
             {user.role !== "contractor" && order?.change_order && (
               <div className="flex flex-row justify-end gap-4 mt-4">
                 <Button outline color="red" className="h-fit">
@@ -276,7 +315,7 @@ export default function Page({ params }: { params: { id: string } }) {
             )}
             {order && <OrderTimeLine order={order} />}
 
-            {!order.change_order && (
+            {!order.change_order && showEditMenu && (
               <div className="flex justify-end mb-5 gap-4">
                 <CSVSelector
                   showModal={showUploadModal}

@@ -10,7 +10,7 @@ type OrderArray = [Order];
 import NewOrderModal from "./newOrder.modal";
 import Link from "next/link";
 import { MergeOrdersbyKey } from "@/utils/commonUtils";
-import { BiSolidChevronUp, BiSolidChevronDown, BiDotsVerticalRounded, BiFilterAlt } from "react-icons/bi";
+import { BiSolidPackage, BiSolidChevronDown, BiDotsVerticalRounded, BiFilterAlt } from "react-icons/bi";
 import DownloadPDF from "./downloadPDF";
 import { TfiAngleDown, TfiAngleUp } from "react-icons/tfi";
 import { HiCheck, HiClock } from "react-icons/hi";
@@ -104,6 +104,12 @@ export default function ClientView() {
 
   function OrderStatus({ status }: { status: string }) {
     switch (status) {
+      case "active":
+        return (
+          <Badge size="xs" color="success" className="justify-center" icon={HiClock}>
+            Active
+          </Badge>
+        );
       case "fulfilled":
         return (
           <Badge size="xs" color="success" className="justify-center" icon={HiCheck}>
@@ -124,7 +130,7 @@ export default function ClientView() {
         );
       case "ordered":
         return (
-          <Badge size="xs" color="cyan" className="justify-center whitespace-nowrap" icon={HiClock}>
+          <Badge size="xs" color="cyan" className="justify-center whitespace-nowrap" icon={BiSolidPackage}>
             Ordered
           </Badge>
         );
@@ -140,7 +146,7 @@ export default function ClientView() {
   return (
     <section className="p-5">
       <div className="flex justify-between mb-8">
-        <h5 className="mb-2 text-4xl font-bold text-gray-900 dark:text-white">{user?.role === "client" ? "Ongoing orders" : "Active Orders"}</h5>
+        <h5 className="mb-2 text-4xl font-bold text-gray-900 dark:text-white">Active Orders</h5>
         {user?.role === "client" && <NewOrderModal showModal={showModal} setShowModal={setShowModal} />}
       </div>
 

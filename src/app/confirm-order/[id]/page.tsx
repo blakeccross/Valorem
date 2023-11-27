@@ -7,22 +7,23 @@ import Image from "next/image";
 import { Database } from "../../../../types/supabase";
 import moment from "moment";
 import MissingProductModal from "./missingProduct.modal";
-import { MergeProductsbyKey } from "@/utils/commonUtils";
 type Product = Database["public"]["Tables"]["product-confirm"]["Row"];
-type Event = Database["public"]["Tables"]["events"]["Row"];
+type Event = Database["public"]["Tables"]["events"]["Row"] & {
+  order_id: {
+    address?: string;
+  };
+};
 type ProductArray = [Product];
 import { HiCheck } from "react-icons/hi";
 import { AiOutlineCloudUpload } from "react-icons/ai";
-import { BiCheck } from "react-icons/bi";
 import { UserContext } from "@/context/userContext";
 import { v4 as uuidv4 } from "uuid";
-import { stringify } from "querystring";
 type Image = { data: File; url: string };
 type ImgUrl = { publicUrl: string };
 
 export default function Page({ params }: { params: { id: string } }) {
   const supabase = createClientComponentClient<Database>();
-  const [event, setEvent] = useState<Event>();
+  const [event, setEvent] = useState<any>();
   const [products, setProducts] = useState<Product[]>([]);
   const [showToast, setShowToast] = useState(false);
   const { user, SignOut } = useContext(UserContext);
@@ -40,7 +41,7 @@ export default function Page({ params }: { params: { id: string } }) {
   }
 
   async function getProducts() {
-    let { data: products, error } = await supabase.from("product-confirm").select("*").eq("event", params.id);
+    let { data: products, error } = await supabase.from("product-confirm").select("*, order_id(address)").eq("event", params.id);
     if (products) {
       setProducts(products);
     }
@@ -57,13 +58,7 @@ export default function Page({ params }: { params: { id: string } }) {
     if (confirmationImages) {
       ImageUrls = await Promise.all(
         confirmationImages.map(async (image) => {
-          const { data } = supabase.storage.from("product-confirmation").getPublicUrl(params.id + "/" + item.id + "/" + image.name, {
-            // transform: {
-            //   width: 300,
-            //   height: 300,
-            //   resize: "contain",
-            // },
-          });
+          const { data } = supabase.storage.from("product-confirmation").getPublicUrl(params.id + "/" + item.id + "/" + image.name, {});
           return data;
         })
       ).then((values) => {
@@ -85,7 +80,6 @@ export default function Page({ params }: { params: { id: string } }) {
 
     async function getImageUrls() {
       let ImageUrlsResponse = await getImages({ item });
-      console.log("RESPONSE", ImageUrlsResponse);
       setImageUrls(ImageUrlsResponse);
     }
 
@@ -195,7 +189,7 @@ export default function Page({ params }: { params: { id: string } }) {
       </p>
       <p className="mb-2 text-sm text-gray-900 dark:text-white">
         <b>Address: </b>
-        {event?.address}
+        {event?.order_id.address}
       </p>
       <div className="flex justify-end mb-5"></div>
       <div className="flex flex-col flex-1 gap-4">

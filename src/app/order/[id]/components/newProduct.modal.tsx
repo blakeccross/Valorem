@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../../../types/supabase";
-import moment from "moment";
 type Order = Database["public"]["Tables"]["orders"]["Row"];
 type Catalog = Database["public"]["Tables"]["catalog"]["Row"];
 type Product = Database["public"]["Tables"]["products"]["Row"];
@@ -11,7 +10,6 @@ import { Button, Checkbox, Label, Modal, TextInput, Select, Textarea } from "flo
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import CircularProgress from "@mui/material/CircularProgress";
-import { debounce } from "@mui/material/utils";
 
 export default function NewProductModal({
   showModal,

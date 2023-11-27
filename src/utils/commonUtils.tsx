@@ -1,3 +1,6 @@
+import { Database } from "../../types/supabase";
+type Product = Database["public"]["Tables"]["products"]["Row"];
+
 export function MergeProductsbyKey(array: any, key: string) {
   const arrays: any = [];
 
@@ -77,4 +80,16 @@ function toRad(Value: number) {
 // Adds commas to numbers
 export function numberWithCommas(x: number) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+export function calculateTotalPrice(products: Product[], property: "retail_price" | "price") {
+  let totalCost = 0;
+
+  // Iterate through the array
+  for (let i = 0; i < products.length; i++) {
+    // Multiply quantity by price for each item and add to totalCost
+    totalCost += products[i].quantity * products[i][property]!;
+  }
+
+  return totalCost;
 }
