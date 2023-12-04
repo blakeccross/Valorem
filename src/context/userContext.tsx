@@ -6,12 +6,14 @@ import { Session, createClientComponentClient } from "@supabase/auth-helpers-nex
 import { Database } from "../../types/supabase";
 import { useRouter } from "next/navigation";
 type User = Database["public"]["Tables"]["profiles"]["Row"];
+type Orginizations = Database["public"]["Tables"]["organizations"]["Row"];
 
 export const UserContext = createContext<any | null>(null);
 
 export default function UserProvider({ children }: any) {
   const supabase = createClientComponentClient<Database>();
   const [user, setUser] = useState<User | null>(null);
+  const [organizations, setOrganizations] = useState<Orginizations[]>([]);
   const [session, setSession] = useState<Session | null>(null);
   const router = useRouter();
 
@@ -39,6 +41,23 @@ export default function UserProvider({ children }: any) {
     }
   }
 
+  async function handleGetOrganizations() {
+    let { data: orgs, error } = await supabase
+      .from("user_organizations")
+      .select("organizations(*)")
+      .eq("user", session?.user.id || "");
+    if (orgs) {
+      let formattedOrganizations: Orginizations[] = orgs
+        .flatMap((item) => item.organizations || []) // Flatten and filter out null values
+        .filter(Boolean);
+
+      setOrganizations(formattedOrganizations);
+    }
+    if (error) {
+      console.log(error);
+    }
+  }
+
   async function SignOut() {
     let { error } = await supabase.auth.signOut();
     if (error) {
@@ -52,6 +71,7 @@ export default function UserProvider({ children }: any) {
   useEffect(() => {
     if (session) {
       handleGetUser();
+      handleGetOrganizations();
     }
   }, [session]);
 
@@ -65,5 +85,5 @@ export default function UserProvider({ children }: any) {
     };
   }, []);
 
-  return <UserContext.Provider value={{ user, SignOut }}>{children}</UserContext.Provider>;
+  return <UserContext.Provider value={{ user, organizations, SignOut }}>{children}</UserContext.Provider>;
 }

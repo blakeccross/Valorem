@@ -1,16 +1,14 @@
 "use client";
 
-import { Timeline, Table, Badge, Dropdown, Label, TextInput, Spinner } from "flowbite-react";
+import { Timeline, Table, Badge, Dropdown, Select, TextInput, Spinner, Label } from "flowbite-react";
 import { useState, useEffect, useRef, Fragment, useContext } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../types/supabase";
 import moment from "moment";
-type Order = Database["public"]["Tables"]["orders"]["Row"];
-type OrderArray = [Order];
 import NewOrderModal from "./newOrder.modal";
 import Link from "next/link";
 import { MergeOrdersbyKey } from "@/utils/commonUtils";
-import { BiSolidPackage, BiSolidChevronDown, BiDotsVerticalRounded, BiFilterAlt } from "react-icons/bi";
+import { BiSolidPackage, BiDotsVerticalRounded } from "react-icons/bi";
 import DownloadPDF from "./downloadPDF";
 import { TfiAngleDown, TfiAngleUp } from "react-icons/tfi";
 import { HiCheck, HiClock } from "react-icons/hi";
@@ -21,6 +19,9 @@ import { BsArrowUpShort, BsArrowDownShort, BsPlus } from "react-icons/bs";
 import { BiSortDown } from "react-icons/bi";
 import { UserContext } from "@/context/userContext";
 import Loading from "../loading";
+type Order = Database["public"]["Tables"]["orders"]["Row"];
+type OrderArray = [Order];
+type Orginizations = Database["public"]["Tables"]["organizations"]["Row"];
 
 export default function ClientView() {
   const supabase = createClientComponentClient<Database>();
@@ -35,11 +36,18 @@ export default function ClientView() {
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState<boolean>(false);
   const [viewHistory, setViewHistory] = useState<number | null>(null);
   const router = useRouter();
-  const { user, SignOut } = useContext(UserContext);
+  const { user, organizations } = useContext(UserContext);
+  const [selectedOrginization, setSelectedOrginization] = useState<string>("");
+
+  useEffect(() => {
+    if (organizations.length > 0) {
+      setSelectedOrginization(organizations[0].id);
+    }
+  }, [organizations]);
 
   useEffect(() => {
     getOrders();
-  }, [sortBy, searchInput]);
+  }, [sortBy, searchInput, selectedOrginization]);
 
   useEffect(() => {
     if (orders.length !== 0) {
@@ -51,6 +59,7 @@ export default function ClientView() {
     setTableIsLoading(true);
     let searchOrders = supabase.from("orders").select("*").order(sortBy, { ascending: true });
     if (searchInput) searchOrders.textSearch("project_name", searchInput);
+    searchOrders.eq("organization", selectedOrginization);
 
     await searchOrders.then(({ data: orders, error }) => {
       if (error) {
@@ -145,15 +154,35 @@ export default function ClientView() {
 
   return (
     <section className="p-5">
-      <div className="flex justify-between mb-8">
-        <h5 className="mb-2 text-4xl font-bold text-gray-900 dark:text-white">Active Orders</h5>
+      <div className="flex justify-between mb-4">
+        <h5 className="text-4xl font-bold text-gray-900 dark:text-white">Active Orders</h5>
         {user?.role === "client" && <NewOrderModal showModal={showModal} setShowModal={setShowModal} />}
       </div>
 
-      <div className="flex gap-4 mb-4">
-        <TextInput placeholder="Search" onChange={(e) => setSearchInput(e.target.value)} value={searchInput} className="w-60" />
+      <div className="flex gap-4 mb-4 items-end">
+        <div className="max-w-md">
+          <div className="mb-2 block">
+            <Label htmlFor="search" value="Search" />
+          </div>
+          <TextInput placeholder="Project name" onChange={(e) => setSearchInput(e.target.value)} value={searchInput} className="w-60" />
+        </div>
 
-        <Dropdown label={<BiSortDown size={17} />} arrowIcon={false} color="white">
+        <div className="max-w-md">
+          <div className="mb-2 block">
+            <Label htmlFor="countries" value="Select your organization" />
+          </div>
+          {organizations.length > 1 && (
+            <Select id="countries" required onChange={(e) => setSelectedOrginization(e.target.value)}>
+              {organizations.map((item: Orginizations) => (
+                <option value={item.id} key={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </Select>
+          )}
+        </div>
+
+        <Dropdown label={<BiSortDown size={17} className=" dark:text-white" />} arrowIcon={false} color="white">
           <Dropdown.Header>
             <strong>Sort By</strong>
           </Dropdown.Header>
@@ -165,7 +194,7 @@ export default function ClientView() {
         <div className=" ml-auto mr-auto mt-72 text-center">
           <Spinner size="xl" />
         </div>
-      ) : (
+      ) : orders.length !== 0 ? (
         <Table striped className="w-full">
           <Table.Head>
             <Table.HeadCell></Table.HeadCell>
@@ -294,6 +323,11 @@ export default function ClientView() {
             ))}
           </Table.Body>
         </Table>
+      ) : (
+        <div className="mx-auto my-24">
+          <h5 className="mb-2 text-2xl font-bold text-gray-600 dark:text-white text-center">No Results</h5>
+          <p className="mb-2 text-sm text-gray-400 dark:text-white text-center">There are no orders matching</p>
+        </div>
       )}
       <ConfirmationModal
         showModal={showDeleteConfirmModal}
