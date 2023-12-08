@@ -10,6 +10,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { BsCalendar } from "react-icons/bs";
 import { PiHammer } from "react-icons/pi";
+import { MdOutlineCalendarToday, MdNotificationsNone } from "react-icons/md";
+import { FiBell } from "react-icons/fi";
 
 export default function NavbarWithDropdown() {
   const supabase = createClientComponentClient<Database>();
@@ -29,20 +31,55 @@ export default function NavbarWithDropdown() {
           <div className="flex flex-shrink-0 justify-between items-center ml-4 lg:order-2">
             {user ? (
               <>
-                <ul className="hidden flex-col justify-center mt-0 w-full text-sm font-medium text-gray-500 md:flex-row dark:text-gray-400 md:flex">
+                <ul className="hidden flex-col justify-center mt-0 w-full text-sm font-medium text-gray-500 md:flex-row dark:text-gray-400 md:flex items-center">
                   <li className="block border-b dark:border-gray-700 md:inline md:border-b-0">
                     <Link href={"/order"} className="block py-3 px-4 rounded-lg hover:text-gray-900 dark:hover:text-white">
-                      <PiHammer size={25} />
+                      <PiHammer size={20} />
                     </Link>
                   </li>
                   <li className="block border-b dark:border-gray-700 md:inline md:border-b-0">
                     <Link href={"/calendar"} className="block py-3 px-4 rounded-lg hover:text-gray-900 dark:hover:text-white">
-                      <BsCalendar size={25} />
+                      <MdOutlineCalendarToday size={20} />
                     </Link>
                   </li>
+                  <li className="block border-b dark:border-gray-700 md:inline md:border-b-0">
+                    <div className="block py-3 px-4 rounded-lg hover:text-gray-900 dark:hover:text-white cursor-pointer">
+                      <Dropdown
+                        inline
+                        label=""
+                        placement="bottom"
+                        renderTrigger={() => (
+                          <span>
+                            <FiBell size={22} />
+                          </span>
+                        )}
+                        size={"sm"}
+                      >
+                        <Dropdown.Header>
+                          <span className="flex justify-center">Notifications</span>
+                        </Dropdown.Header>
+                        <Dropdown.Item onClick={() => router.push("/notifications")}>
+                          <strong>Josh H.</strong>&nbsp;has declined the change order
+                        </Dropdown.Item>
+                        <Dropdown.Divider />
+                        <Dropdown.Item>
+                          <strong>Land Excavation</strong>&nbsp;has been successfully created
+                        </Dropdown.Item>
+                        <Dropdown.Divider />
+                        <Dropdown.Item>
+                          <strong>Project 568</strong>&nbsp;has been successfully created
+                        </Dropdown.Item>
+                      </Dropdown>
+                    </div>
+                    {/* <Dropdown label="awf" inline dismissOnClick={false} renderTrigger={() => <MdNotificationsNone size={30} />}>
+                      <Dropdown.Item>Notification 1</Dropdown.Item>
+                      <Dropdown.Item>Notification 2</Dropdown.Item>
+                      <Dropdown.Item>Notification 3</Dropdown.Item>
+                    </Dropdown> */}
+                  </li>
                 </ul>
-                <div className="pl-4">
-                  <Dropdown inline label={<Avatar alt="User settings" rounded size="md" />}>
+                <div className="pl-2">
+                  <Dropdown inline label={<Avatar alt="User settings" rounded size="sm" />}>
                     <Dropdown.Header>
                       <span className="block text-sm">{user.first_name + " " + user.last_name}</span>
                       <span className="block truncate text-sm font-medium">{user?.email}</span>

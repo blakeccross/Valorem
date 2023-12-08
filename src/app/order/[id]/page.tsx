@@ -21,6 +21,7 @@ import ActiveOrder from "./components/activeOrder";
 import Warranties from "./components/warranties";
 import Settings from "./components/settings";
 import History from "./components/history";
+import { compareArrays } from "@/utils/commonUtils";
 type Product = Database["public"]["Tables"]["products"]["Row"];
 type Order = Database["public"]["Tables"]["orders"]["Row"];
 interface COProduct extends Product {
@@ -64,6 +65,7 @@ export default function Page({ params }: { params: { id: string } }) {
         getPreviousOrder();
       }
     }
+    if (error) alert(error.message);
   }
 
   async function getProducts() {
@@ -105,41 +107,16 @@ export default function Page({ params }: { params: { id: string } }) {
   }
 
   function getChangeOrder() {
-    let resultArray: COProduct[] = [];
-    let ProductArray1 = coProducts.current;
-    let ProductArray2 = previousProducts.current;
+    let currentProducts = coProducts.current;
 
-    ProductArray1.forEach((obj1) => {
-      const noChange = ProductArray2.find((obj2) => obj2.description === obj1.description && obj2.price === obj1.price);
-      const updatedPrice = ProductArray2.find((obj2) => obj2.description === obj1.description && obj2.price !== obj1.price);
-      if (noChange) {
-        resultArray.push({ ...noChange, status: "same" });
-      } else if (updatedPrice) {
-        resultArray.push({ ...updatedPrice, status: "updated" });
-      } else {
-        resultArray.push({ ...obj1, status: "new" });
-      }
-    });
-
-    ProductArray2.forEach((obj2) => {
-      const foundInResult = resultArray.find((obj) => obj.description === obj2.description);
-      if (!foundInResult) {
-        resultArray.push({ ...obj2, status: "removed" });
-      }
-    });
-
+    let resultArray = compareArrays(previousProducts.current, currentProducts);
+    console.log("RESULTS", resultArray, "PREV", previousProducts.current, "CURRENT", currentProducts);
     setProducts(resultArray);
   }
 
   async function createChangeOrder() {
-    // let formattedProducts: Product = products.map((item) => ({
-    //   description: item.description,
-    //   price: item.price,
-    //   quantity: item.quantity,
-    //   size: item.size,
-    //   type: item.type,
-    // }));
-    let allProducts: Product[] = [...products, ...addedProducts];
+    let orderId: number | null = null;
+    let allProducts: COProduct[] = [...products, ...addedProducts];
 
     let totalCost = calculateTotalPrice(allProducts, "price");
 
@@ -159,34 +136,28 @@ export default function Page({ params }: { params: { id: string } }) {
         .limit(1)
         .single();
       if (orderSuccess) {
-        // NEED TO ADD RETAIL PRICE
-        let allProductsUpdatedId = allProducts.map((item) => ({
-          description: item.description,
-          price: item.price,
-          quantity: item.quantity,
-          size: item.size,
-          type: item.type,
-          orderId: orderSuccess.id,
-        }));
-        const { data, error } = await supabase.from("products").insert(allProductsUpdatedId).select();
-        if (error) {
-          alert(error.message);
-        }
-        if (data) {
-          router.push(`/order/${orderSuccess.id}?orderId=${orderSuccess.order_id}`);
-        }
+        orderId = orderSuccess.id;
       }
       if (error) {
         alert(error.message);
       }
     } else {
-      const { data, error } = await supabase.from("products").insert(addedProducts).select();
-      if (error) {
-        alert(error.message);
-      }
-      if (data) {
-        router.refresh();
-      }
+      orderId = +params.id;
+    }
+
+    let allProductsUpdatedId = allProducts
+      .filter((item) => item.status !== "removed")
+      .map((item) => {
+        const { status, id, ...updatedProduct } = item;
+        return { ...updatedProduct, orderId: orderId };
+      });
+
+    const { data, error } = await supabase.from("products").insert(allProductsUpdatedId).select();
+    if (error) {
+      alert(error.message);
+    }
+    if (data) {
+      router.push(`/order/${orderId}?orderId=${params.id}`);
     }
   }
 
@@ -256,23 +227,14 @@ export default function Page({ params }: { params: { id: string } }) {
                 label=""
                 placement="left-start"
                 renderTrigger={() => (
-                  <span>
-                    <BsThreeDotsVertical size={20} />
+                  <span className="dark:text-white">
+                    <BsThreeDotsVertical size={20} className="cursor-pointer" />
                   </span>
                 )}
               >
                 <Dropdown.Item onClick={() => setShowEditMenu(!showEditMenu)}>
-                  {showEditMenu ? (
-                    <>
-                      <IoEyeOff size={15} className="mr-2" />
-                      Edit
-                    </>
-                  ) : (
-                    <>
-                      <IoEye size={15} className="mr-2" />
-                      Edit
-                    </>
-                  )}
+                  {showEditMenu ? <IoEyeOff size={15} className="mr-2" /> : <IoEye size={15} className="mr-2" />}
+                  Edit
                 </Dropdown.Item>
               </Dropdown>
             </div>
@@ -287,7 +249,9 @@ export default function Page({ params }: { params: { id: string } }) {
 
             <Accordion className=" border-0">
               <Accordion.Panel>
-                <Accordion.Title className=" hover:bg-transparent border-0 focus:ring-0 bg-transparent px-0">Details</Accordion.Title>
+                <Accordion.Title className=" hover:bg-transparent dark:hover:bg-transparent border-0 focus:ring-0 bg-transparent px-0">
+                  Details
+                </Accordion.Title>
                 <Accordion.Content>
                   <p className="mb-2 text-sm text-gray-900 dark:text-white">
                     <strong>Access Instructions:</strong>
@@ -355,9 +319,28 @@ export default function Page({ params }: { params: { id: string } }) {
                 <Spinner aria-label="Loading" size="xl" />
               </div>
             ) : order.change_order ? (
-              <ChangeOrder products={products} />
+              // <ChangeOrder products={products} />
+              <ActiveOrder
+                isEditing={showEditMenu}
+                products={[...products, ...addedProducts]}
+                remove={(newProduct) => {
+                  let filtered = products.filter((item) => item.id !== newProduct.id);
+                  setProducts(filtered);
+                  setAddedProducts([...addedProducts, newProduct]);
+                  setShowSubmitButton(true);
+                }}
+              />
             ) : (
-              <ActiveOrder products={[...products, ...addedProducts]} />
+              <ActiveOrder
+                isEditing={showEditMenu}
+                products={[...products, ...addedProducts]}
+                remove={(newProduct) => {
+                  let filtered = products.filter((item) => item.id !== newProduct.id);
+                  setProducts(filtered);
+                  setAddedProducts([...addedProducts, newProduct]);
+                  setShowSubmitButton(true);
+                }}
+              />
             )}
           </section>
         )}

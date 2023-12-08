@@ -35,22 +35,6 @@ export default function NewProductModal({
   const [open, setOpen] = useState(false);
   const loading = open && catalog.length === 0;
 
-  // async function handleAddProduct() {
-  //   const { data, error } = await supabase
-  //     .from("products")
-  //     .insert([{ description: description, quantity: quantity, price: price || 0, size: size, type: category, orderId: orderId }])
-  //     .select();
-  //   if (error) {
-  //     alert(error.message);
-  //   }
-  //   reload();
-  //   setName("");
-  //   setCatalog([]);
-  //   setCategory("");
-  //   setDescription("");
-  //   setShowModal(false);
-  // }
-
   function handleAddProduct() {
     let product = {
       description: description,

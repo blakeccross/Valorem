@@ -1,5 +1,8 @@
 import { Database } from "../../types/supabase";
 type Product = Database["public"]["Tables"]["products"]["Row"];
+interface COProduct extends Product {
+  status: string;
+}
 
 export function MergeProductsbyKey(array: any, key: string) {
   const arrays: any = [];
@@ -92,4 +95,31 @@ export function calculateTotalPrice(products: Product[], property: "retail_price
   }
 
   return totalCost;
+}
+
+export function compareArrays(previousProducts: Product[], currentProducts: Product[]) {
+  const newArray: COProduct[] = [];
+
+  // Find new items
+  currentProducts.forEach((item2) => {
+    if (!previousProducts.some((item1) => item1.description === item2.description)) {
+      newArray.push({ ...item2, status: "new" });
+      // Find items with updated price
+    } else if (previousProducts.some((item1) => item1.description === item2.description && item2.price !== item1.price)) {
+      newArray.push({ ...item2, status: "updated" });
+    } else if (previousProducts.some((item1) => item1.description === item2.description && item2.quantity !== item1.quantity)) {
+      newArray.push({ ...item2, status: "updated" });
+    } else {
+      newArray.push({ ...item2, status: "" });
+    }
+  });
+
+  // Find removed items
+  previousProducts.forEach((item1) => {
+    if (!currentProducts.some((item2) => item2.description === item1.description)) {
+      newArray.push({ ...item1, status: "removed" });
+    }
+  });
+
+  return newArray;
 }

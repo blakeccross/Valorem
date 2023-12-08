@@ -46,7 +46,9 @@ export default function ClientView() {
   }, [organizations]);
 
   useEffect(() => {
-    getOrders();
+    if (selectedOrginization) {
+      getOrders();
+    }
   }, [sortBy, searchInput, selectedOrginization]);
 
   useEffect(() => {

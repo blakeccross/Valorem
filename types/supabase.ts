@@ -165,6 +165,48 @@ export interface Database {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          created_at: string
+          id: number
+          message: string | null
+          notifier: string | null
+          type: string | null
+          user: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          message?: string | null
+          notifier?: string | null
+          type?: string | null
+          user?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          message?: string | null
+          notifier?: string | null
+          type?: string | null
+          user?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_notifier_fkey"
+            columns: ["notifier"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_user_fkey"
+            columns: ["user"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       orders: {
         Row: {
           access_instructions: string | null
