@@ -116,7 +116,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
   async function createChangeOrder() {
     let orderId: number | null = null;
-    let allProducts: COProduct[] = [...products, ...addedProducts];
+    let allProducts: any[] = [...products, ...addedProducts];
 
     let totalCost = calculateTotalPrice(allProducts, "price");
 

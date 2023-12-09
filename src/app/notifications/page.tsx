@@ -6,7 +6,7 @@ import moment from "moment";
 import { useRouter } from "next/navigation";
 import { UserContext } from "@/context/userContext";
 import { IoMdClose } from "react-icons/io";
-type Notification = Database["public"]["Tables"]["notifications"]["Row"];
+type Notification = Database["public"]["Tables"]["notifications"]["Row"] & { notifier: { first_name?: string; last_name?: string } };
 
 export default function Notifications() {
   const supabase = createClientComponentClient<Database>();
