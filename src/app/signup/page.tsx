@@ -1,10 +1,37 @@
+"use client";
+// import { EmailForm } from "~/components/EmailForm";
+// import { useFormState } from "~/components/FormContext";
+// import { PasswordForm } from "~/components/PasswordForm";
+import { useFormState, FormProvider } from "./components/formState";
+// import { UserNameForm } from "~/components/UserNameFrom";
+import { UserNameForm } from "./components/userNameForm";
 import AuthForm from "./auth-form";
-export default function Login() {
+
+function ActiveStepFormComponent() {
+  const { step } = useFormState();
+  switch (step) {
+    case 1:
+      return <UserNameForm />;
+    case 2:
+      return <AuthForm />;
+    case 3:
+      return <UserNameForm />;
+    default:
+      return null;
+  }
+}
+
+export default function Home() {
   return (
-    <section className="bg-gray-50 dark:bg-gray-900">
-      <div className="mx-auto grid max-w-screen-xl px-4 py-8lg:gap-20 lg:py-16">
-        <AuthForm />
-      </div>
-    </section>
+    <FormProvider>
+      <main className="flex min-h-screen flex-col items-center justify-between p-24">
+        <div className="p-6 w-full max-w-2xl  border  rounded-xl bg-white">
+          <h1 className="text-center text-2xl font-semibold py-4">Sign Up Form</h1>
+          <div className="space-y-6">
+            <ActiveStepFormComponent />
+          </div>
+        </div>
+      </main>
+    </FormProvider>
   );
 }
