@@ -38,7 +38,7 @@ export default function Page() {
     <section className="p-5">
       <div className="flex justify-between mb-8">
         <h2 className="mb-8 text-4xl font-bold text-gray-900 dark:text-white">Warranties</h2>
-        {user?.role === "client" && <NewWarrantyModal showModal={showModal} setShowModal={setShowModal} reload={getWarrenties} />}
+        {user?.type === "client" && <NewWarrantyModal showModal={showModal} setShowModal={setShowModal} reload={getWarrenties} />}
       </div>
       <Table striped>
         <Table.Head>

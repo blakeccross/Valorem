@@ -400,7 +400,7 @@ export interface Database {
           id: string
           last_name: string | null
           phone: string | null
-          role: Database["public"]["Enums"]["role_enum"]
+          type: Database["public"]["Enums"]["user_type"]
         }
         Insert: {
           avatar_url?: string | null
@@ -410,7 +410,7 @@ export interface Database {
           id: string
           last_name?: string | null
           phone?: string | null
-          role?: Database["public"]["Enums"]["role_enum"]
+          type?: Database["public"]["Enums"]["user_type"]
         }
         Update: {
           avatar_url?: string | null
@@ -420,7 +420,7 @@ export interface Database {
           id?: string
           last_name?: string | null
           phone?: string | null
-          role?: Database["public"]["Enums"]["role_enum"]
+          type?: Database["public"]["Enums"]["user_type"]
         }
         Relationships: []
       }
@@ -536,6 +536,7 @@ export interface Database {
     }
     Enums: {
       role_enum: "contractor" | "client"
+      user_type: "supplier" | "vendor" | "client"
     }
     CompositeTypes: {
       [_ in never]: never

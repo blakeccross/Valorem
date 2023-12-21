@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import AuthForm from "./auth-form";
-import CompanyForm from "./company-form";
-import SignupProgress from "./signupProgress";
+import AuthForm from "./components/auth-form";
+import CompanyForm from "./components/company-form";
+import SignupProgress from "./components/signupProgress";
 export default function Login() {
   const [formStep, setFormStep] = useState(0);
 
@@ -31,7 +31,7 @@ export default function Login() {
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="mx-auto grid max-w-screen-xl px-4 py-8lg:gap-20 lg:py-16">
-        <SignupProgress />
+        {/* <SignupProgress /> */}
         <CompanyForm />
         <AuthForm />
       </div>

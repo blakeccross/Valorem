@@ -72,7 +72,13 @@ export default function Settings({ order }: { order: Order }) {
       <div className="flex flex-col gap-2">
         <div>
           <Label htmlFor="countries">Trade</Label>
-          <Select id="countries" required value={trade} onChange={(e) => setTrade(e.target.value)} disabled={user.role === "contractor"}>
+          <Select
+            id="countries"
+            required
+            value={trade}
+            onChange={(e) => setTrade(e.target.value)}
+            disabled={user.type === "vendor" || user.type === "supplier"}
+          >
             <option disabled></option>
             <option>Exterior / Landscaping</option>
             <option>MEP / General</option>
@@ -91,7 +97,13 @@ export default function Settings({ order }: { order: Order }) {
         </div>
         <div>
           <Label>Project Name</Label>
-          <TextInput id="name" required value={name} onChange={(e) => setName(e.target.value)} disabled={user.role === "contractor"} />
+          <TextInput
+            id="name"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={user.type === "vendor" || user.type === "supplier"}
+          />
         </div>
         <div>
           <Label htmlFor="email">Address</Label>
@@ -111,7 +123,13 @@ export default function Settings({ order }: { order: Order }) {
         </div>
         <div>
           <Label>Main Sqft</Label>
-          <TextInput required type="number" value={size} onChange={(e) => setSize(e.target.valueAsNumber)} disabled={user.role === "contractor"} />
+          <TextInput
+            required
+            type="number"
+            value={size}
+            onChange={(e) => setSize(e.target.valueAsNumber)}
+            disabled={user.type === "vendor" || user.type === "supplier"}
+          />
         </div>
         <div>
           <Label htmlFor="comment">Access Instructions</Label>
@@ -133,7 +151,7 @@ export default function Settings({ order }: { order: Order }) {
             rows={4}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            disabled={user.role === "contractor"}
+            disabled={user.type === "vendor" || user.type === "supplier"}
           />
         </div>
 

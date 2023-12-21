@@ -158,7 +158,7 @@ export default function ClientView() {
     <section className="p-5">
       <div className="flex justify-between mb-4">
         <h5 className="text-4xl font-bold text-gray-900 dark:text-white">Active Orders</h5>
-        {user?.role === "client" && <NewOrderModal showModal={showModal} setShowModal={setShowModal} />}
+        {user?.type === "client" && <NewOrderModal showModal={showModal} setShowModal={setShowModal} />}
       </div>
 
       <div className="flex gap-4 mb-4 items-end">
@@ -168,12 +168,11 @@ export default function ClientView() {
           </div>
           <TextInput placeholder="Project name" onChange={(e) => setSearchInput(e.target.value)} value={searchInput} className="w-60" />
         </div>
-
-        <div className="max-w-md">
-          <div className="mb-2 block">
-            <Label htmlFor="countries" value="Select your organization" />
-          </div>
-          {organizations.length > 1 && (
+        {organizations.length > 1 && (
+          <div className="max-w-md">
+            <div className="mb-2 block">
+              <Label htmlFor="countries" value="Select your organization" />
+            </div>
             <Select id="countries" required onChange={(e) => setSelectedOrginization(e.target.value)}>
               {organizations.map((item: Orginizations) => (
                 <option value={item.id} key={item.id}>
@@ -181,8 +180,8 @@ export default function ClientView() {
                 </option>
               ))}
             </Select>
-          )}
-        </div>
+          </div>
+        )}
 
         <Dropdown label={<BiSortDown size={17} className=" dark:text-white" />} arrowIcon={false} color="white">
           <Dropdown.Header>
@@ -205,7 +204,7 @@ export default function ClientView() {
             <Table.HeadCell>Starting Date</Table.HeadCell>
             <Table.HeadCell>Address</Table.HeadCell>
             <Table.HeadCell>Status</Table.HeadCell>
-            {user?.role === "client" && <Table.HeadCell></Table.HeadCell>}
+            {user?.type === "client" && <Table.HeadCell></Table.HeadCell>}
             <Table.HeadCell className="w-1">
               <span className="sr-only">View Order</span>
             </Table.HeadCell>
@@ -236,7 +235,7 @@ export default function ClientView() {
                       <p>{!order[0].change_order ? "View Order" : "View CO"}</p>
                     </Link>
                   </Table.Cell>
-                  {user?.role === "client" && (
+                  {user?.type === "client" && (
                     <Table.Cell className="">
                       <div className="relative cursor-pointer">
                         <Dropdown renderTrigger={() => <BiDotsVerticalRounded size={25} />} label="" className="!left-[-50px] !top-6">
@@ -328,7 +327,7 @@ export default function ClientView() {
       ) : (
         <div className="mx-auto my-24">
           <h5 className="mb-2 text-2xl font-bold text-gray-600 dark:text-white text-center">No Results</h5>
-          <p className="mb-2 text-sm text-gray-400 dark:text-white text-center">There are no orders matching</p>
+          <p className="mb-2 text-sm text-gray-400 dark:text-white text-center">There are currently no orders.</p>
         </div>
       )}
       <ConfirmationModal

@@ -2,11 +2,12 @@
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Database } from "../../../types/supabase";
+import { Database } from "../../../../types/supabase";
 import { Button, Checkbox, Label, TextInput, Select } from "flowbite-react";
 import ConfirmationModal from "@/components/confirmation.modal";
 import SignupProgress from "./signupProgress";
 import { useForm } from "react-hook-form";
+import { useFormState } from "./formState";
 
 type FormValues = {
   firstName: string;
@@ -27,6 +28,7 @@ export default function AuthForm() {
   const [error, setError] = useState<boolean>(false);
   const router = useRouter();
   const supabase = createClientComponentClient<Database>();
+  const { onHandleNext, setFormData, formData } = useFormState();
 
   const handleSignUp = async () => {
     const { data, error } = await supabase.auth.signUp({
@@ -56,7 +58,15 @@ export default function AuthForm() {
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>();
-  const onSubmit = handleSubmit((data) => console.log(data));
+  const onSubmit = handleSubmit((data) => {
+    setFormData((prev: any) => ({ ...prev, ...data }));
+    onHandleNext();
+  });
+
+  // function onSubmit(data: any) {
+  //   setFormData((prev: any) => ({ ...prev, ...data }));
+  //   onHandleNext();
+  // }
 
   return (
     <form onSubmit={onSubmit} className="w-full place-self-center lg:col-span-6">

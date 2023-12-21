@@ -268,7 +268,7 @@ export default function Page({ params }: { params: { id: string } }) {
               </Accordion.Panel>
             </Accordion>
 
-            {user.role !== "contractor" && order?.change_order && (
+            {user.type !== "contractor" && order?.change_order && (
               <div className="flex flex-row justify-end gap-4 mt-4">
                 <Button outline color="red" className="h-fit">
                   <MdClose size={20} />
