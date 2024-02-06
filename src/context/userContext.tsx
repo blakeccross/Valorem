@@ -10,7 +10,7 @@ type Orginizations = Database["public"]["Tables"]["organizations"]["Row"];
 
 export const UserContext = createContext<any | null>(null);
 
-export default function UserProvider({ children }: any) {
+export default function UserProvider({ children }: { children: React.ReactNode }) {
   const supabase = createClientComponentClient<Database>();
   const [user, setUser] = useState<User | null>(null);
   const [organizations, setOrganizations] = useState<Orginizations[]>([]);

@@ -399,6 +399,7 @@ export interface Database {
           first_name: string | null
           id: string
           last_name: string | null
+          markets: string[] | null
           phone: string | null
           type: Database["public"]["Enums"]["user_type"]
         }
@@ -409,6 +410,7 @@ export interface Database {
           first_name?: string | null
           id: string
           last_name?: string | null
+          markets?: string[] | null
           phone?: string | null
           type?: Database["public"]["Enums"]["user_type"]
         }
@@ -419,6 +421,7 @@ export interface Database {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          markets?: string[] | null
           phone?: string | null
           type?: Database["public"]["Enums"]["user_type"]
         }
