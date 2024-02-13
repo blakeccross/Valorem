@@ -2,6 +2,7 @@
 
 import { SidebarContext } from "@/context/sidebarContext";
 import { Badge, Sidebar } from "flowbite-react";
+import { usePathname } from "next/navigation";
 import { useContext, useEffect } from "react";
 import { HiArrowSmRight, HiChartPie, HiInbox, HiOutlineClipboardList, HiBell, HiTable, HiUser, HiViewBoards, HiCalendar } from "react-icons/hi";
 import { HiBolt } from "react-icons/hi2";
@@ -9,6 +10,7 @@ import { RiSettings3Fill } from "react-icons/ri";
 
 export default function SidebarNav() {
   const { collapseSidebar, setCollapseSidebar } = useContext(SidebarContext);
+  const pathname = usePathname();
 
   useEffect(() => {
     // Function to check window size and update state
@@ -32,29 +34,30 @@ export default function SidebarNav() {
     <Sidebar aria-label="Sidebar" className="fixed left-0" collapsed={collapseSidebar}>
       <Sidebar.Items>
         <Sidebar.ItemGroup>
-          <Sidebar.Item href="/dashboard" icon={HiChartPie}>
+          <Sidebar.Item href="/dashboard" icon={HiChartPie} active={pathname === "/dashboard"}>
             Dashboard
           </Sidebar.Item>
-          <Sidebar.Item href="/order" icon={HiBolt}>
+          <Sidebar.Item href="/order" icon={HiBolt} active={pathname === "/order"}>
             Orders
           </Sidebar.Item>
-          <Sidebar.Item href="/inbox" icon={HiInbox}>
+          <Sidebar.Item href="/inbox" icon={HiInbox} active={pathname === "/inbox"}>
             Inbox
           </Sidebar.Item>
-          <Sidebar.Item href="/users" icon={HiUser}>
+          <Sidebar.Item href="/users" icon={HiUser} active={pathname === "/users"}>
             Users
           </Sidebar.Item>
-          <Sidebar.Item href="/notifications" icon={HiBell}>
+          <Sidebar.Item href="/notifications" icon={HiBell} active={pathname === "/notifications"}>
             Notifications
           </Sidebar.Item>
-          <Sidebar.Item href="/calendar" icon={HiCalendar}>
+          <Sidebar.Item href="/calendar" icon={HiCalendar} active={pathname === "/calendar"}>
             Calendar
           </Sidebar.Item>
-          <Sidebar.Item href="/settings" icon={RiSettings3Fill}>
+          <Sidebar.Item href="/settings" icon={RiSettings3Fill} active={pathname === "/settings"}>
             Settings
           </Sidebar.Item>
         </Sidebar.ItemGroup>
       </Sidebar.Items>
+
       {/* <Sidebar.CTA>
         <div className="mb-3 flex items-center">
           <Badge color="warning">Beta</Badge>

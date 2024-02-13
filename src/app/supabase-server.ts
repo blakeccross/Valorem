@@ -3,7 +3,7 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { cache } from "react";
 
-type User = Database["public"]["Tables"]["profiles"]["Row"] & { User_Organizations: User_Organizations[] };
+type User = Database["public"]["Tables"]["profiles"]["Row"] & { user_organizations: User_Organizations[] };
 type User_Organizations = Database["public"]["Tables"]["user_organizations"]["Row"];
 
 export const createServerSupabaseClient = cache(() => createServerComponentClient<Database>({ cookies }));

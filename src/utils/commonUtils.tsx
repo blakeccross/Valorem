@@ -3,6 +3,8 @@ type Product = Database["public"]["Tables"]["products"]["Row"];
 interface COProduct extends Product {
   status: string;
 }
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function MergeProductsbyKey(array: any, key: string) {
   const arrays: any = [];
@@ -134,4 +136,8 @@ export function formatToUSD(value: number): string {
 
 export function formatNumber(value: number): string {
   return value.toLocaleString("en-US");
+}
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
 }
