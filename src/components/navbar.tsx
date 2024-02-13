@@ -1,7 +1,7 @@
 "use client";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Dropdown, Navbar, Avatar, Button } from "flowbite-react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Session, createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../types/supabase";
 import { useRouter } from "next/navigation";
 import { UserContext } from "@/context/userContext";
@@ -13,13 +13,27 @@ import { PiHammer } from "react-icons/pi";
 import { MdOutlineCalendarToday, MdNotificationsNone } from "react-icons/md";
 import { FiBell } from "react-icons/fi";
 import { HiChartPie, HiMiniSquares2X2 } from "react-icons/hi2";
-import { getUserDetails } from "@/app/supabase-server";
 type User = Database["public"]["Tables"]["profiles"]["Row"];
 
 export default function NavbarWithDropdown() {
   const supabase = createClientComponentClient<Database>();
   const router = useRouter();
-  const { user, SignOut } = useContext(UserContext);
+  // const { user, SignOut } = useContext(UserContext);
+  const [session, setSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    handleGetSession();
+  }, []);
+
+  async function handleGetSession() {
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
+    if (session) {
+      setSession(session);
+    }
+  }
 
   return (
     <header className="flex flex-col">
@@ -32,7 +46,7 @@ export default function NavbarWithDropdown() {
             </Link>
           </div>
           <div className="flex flex-shrink-0 justify-between items-center ml-4 lg:order-2">
-            {user ? (
+            {session ? (
               <>
                 <ul className="hidden flex-col justify-center mt-0 w-full text-sm font-medium text-gray-500 md:flex-row dark:text-gray-400 md:flex items-center">
                   {/* <li className="block border-b dark:border-gray-700 md:inline md:border-b-0">
@@ -154,8 +168,8 @@ export default function NavbarWithDropdown() {
                 <div className="pl-2">
                   <Dropdown inline label={<Avatar alt="User settings" rounded size="sm" />}>
                     <Dropdown.Header>
-                      <span className="block text-sm">{user.first_name + " " + user.last_name}</span>
-                      <span className="block truncate text-sm font-medium">{user?.email}</span>
+                      {/* <span className="block text-sm">{user.first_name + " " + user.last_name}</span> */}
+                      <span className="block truncate text-sm font-medium">{session.user.email}</span>
                     </Dropdown.Header>
                     <Dropdown.Item href="/settings">Settings</Dropdown.Item>
                     <Dropdown.Divider />
