@@ -1,6 +1,6 @@
 import { FC, PropsWithChildren } from "react";
 import FlowbiteContext from "@/context/FlowbiteContext";
-import "@/app/globals.css";
+import "../globals.css";
 import NavbarWithDropdown from "@/components/navbar";
 import UserProvider from "@/context/userContext";
 import { Flowbite, ThemeModeScript } from "flowbite-react";
