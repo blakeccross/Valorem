@@ -19,7 +19,8 @@ export default function Warranties({ products }: { products: Product[] }) {
   const [warranties, setWarranties] = useState<Warranty[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [viewHistory, setViewHistory] = useState<number | null>(null);
-  const { user, SignOut } = useContext(UserContext);
+  const { user, organization } = useContext(UserContext);
+  const currentOrganization = user.user_organizations.find((org) => organization.id === org.organization);
 
   useEffect(() => {
     getWarrenties();
@@ -46,7 +47,7 @@ export default function Warranties({ products }: { products: Product[] }) {
     <section className="p-5">
       <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">Warranties</h1>
       <div className="flex justify-end mb-8">
-        {user?.type === "client" && <NewWarrantyModal showModal={showModal} setShowModal={setShowModal} reload={getWarrenties} />}
+        {currentOrganization?.type === "client" && <NewWarrantyModal showModal={showModal} setShowModal={setShowModal} reload={getWarrenties} />}
       </div>
       {warranties.length > 0 ? (
         <Table striped>

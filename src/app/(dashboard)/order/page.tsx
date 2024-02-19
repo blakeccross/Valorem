@@ -36,20 +36,21 @@ export default function ClientView() {
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState<boolean>(false);
   const [viewHistory, setViewHistory] = useState<number | null>(null);
   const router = useRouter();
-  const { user, organizations } = useContext(UserContext);
+  const { user, organization, allOrganizations } = useContext(UserContext);
   const [selectedOrginization, setSelectedOrginization] = useState<string>("");
+  const currentOrganization = user.user_organizations.find((org) => organization.id === org.organization);
+
+  // useEffect(() => {
+  //   if (allOrganizations.length > 0) {
+  //     setSelectedOrginization(allOrganizations[0].id);
+  //   }
+  // }, [allOrganizations]);
 
   useEffect(() => {
-    if (organizations.length > 0) {
-      setSelectedOrginization(organizations[0].id);
-    }
-  }, [organizations]);
-
-  useEffect(() => {
-    if (selectedOrginization) {
+    if (organization) {
       getOrders();
     }
-  }, [sortBy, searchInput, selectedOrginization]);
+  }, [sortBy, searchInput, organization.id]);
 
   useEffect(() => {
     if (orders.length !== 0) {
@@ -61,7 +62,7 @@ export default function ClientView() {
     setTableIsLoading(true);
     let searchOrders = supabase.from("orders").select("*").order(sortBy, { ascending: true });
     if (searchInput) searchOrders.textSearch("project_name", searchInput);
-    searchOrders.eq("organization", selectedOrginization);
+    searchOrders.eq("organization", organization.id);
 
     await searchOrders.then(({ data: orders, error }) => {
       if (error) {
@@ -158,7 +159,7 @@ export default function ClientView() {
     <section className="p-5">
       <div className="flex justify-between mb-4">
         <h5 className="text-4xl font-bold text-gray-900 dark:text-white">Active Orders</h5>
-        {user?.type === "client" && <NewOrderModal showModal={showModal} setShowModal={setShowModal} />}
+        {currentOrganization?.type === "client" && <NewOrderModal showModal={showModal} setShowModal={setShowModal} />}
       </div>
 
       <div className="flex gap-4 mb-4 items-end">
@@ -168,20 +169,20 @@ export default function ClientView() {
           </div>
           <TextInput placeholder="Project name" onChange={(e) => setSearchInput(e.target.value)} value={searchInput} className="w-60" />
         </div>
-        {organizations.length > 1 && (
+        {/* {allOrganizations.length > 1 && (
           <div className="max-w-md">
             <div className="mb-2 block">
               <Label htmlFor="countries" value="Select your organization" />
             </div>
             <Select id="countries" required onChange={(e) => setSelectedOrginization(e.target.value)}>
-              {organizations.map((item: Orginizations) => (
+              {allOrganizations.map((item: Orginizations) => (
                 <option value={item.id} key={item.id}>
                   {item.name}
                 </option>
               ))}
             </Select>
           </div>
-        )}
+        )} */}
 
         <Dropdown label={<BiSortDown size={17} className=" dark:text-white" />} arrowIcon={false} color="white">
           <Dropdown.Header>
@@ -204,7 +205,7 @@ export default function ClientView() {
             <Table.HeadCell>Starting Date</Table.HeadCell>
             <Table.HeadCell>Address</Table.HeadCell>
             <Table.HeadCell>Status</Table.HeadCell>
-            {user?.type === "client" && <Table.HeadCell></Table.HeadCell>}
+            {currentOrganization?.type === "client" && <Table.HeadCell></Table.HeadCell>}
             <Table.HeadCell className="w-1">
               <span className="sr-only">View Order</span>
             </Table.HeadCell>
@@ -235,7 +236,7 @@ export default function ClientView() {
                       <p>{!order[0].change_order ? "View Order" : "View CO"}</p>
                     </Link>
                   </Table.Cell>
-                  {user?.type === "client" && (
+                  {currentOrganization?.type === "client" && (
                     <Table.Cell className="">
                       <div className="relative cursor-pointer">
                         <Dropdown renderTrigger={() => <BiDotsVerticalRounded size={25} />} label="" className="!left-[-50px] !top-6">

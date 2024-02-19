@@ -39,7 +39,7 @@ export default function Confirmation() {
     });
     if (error) alert(error.message);
     if (user) {
-      await setUserType(user.id);
+      // await setUserType(user.id);
       if (formData.accountType === "client") {
         let organization = await handleCreateOrgination();
         if (organization) {
@@ -61,12 +61,12 @@ export default function Confirmation() {
     }
   }
 
-  async function setUserType(userId: string) {
-    const { data, error } = await supabase.from("profiles").update({ type: formData.accountType }).eq("id", userId).select();
+  // async function setUserType(userId: string) {
+  //   const { data, error } = await supabase.from("profiles").update({ type: formData.accountType }).eq("id", userId).select();
 
-    if (error) alert(error.message);
-    if (data) router.refresh();
-  }
+  //   if (error) alert(error.message);
+  //   if (data) router.refresh();
+  // }
 
   async function handleAddUserToOrg(userId: string, organizationId: string) {
     const { data, error } = await supabase

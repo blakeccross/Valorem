@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       catalog: {
@@ -401,7 +401,6 @@ export interface Database {
           last_name: string | null
           markets: string[] | null
           phone: string | null
-          type: Database["public"]["Enums"]["user_type"]
         }
         Insert: {
           avatar_url?: string | null
@@ -412,7 +411,6 @@ export interface Database {
           last_name?: string | null
           markets?: string[] | null
           phone?: string | null
-          type?: Database["public"]["Enums"]["user_type"]
         }
         Update: {
           avatar_url?: string | null
@@ -423,7 +421,6 @@ export interface Database {
           last_name?: string | null
           markets?: string[] | null
           phone?: string | null
-          type?: Database["public"]["Enums"]["user_type"]
         }
         Relationships: []
       }
@@ -432,18 +429,24 @@ export interface Database {
           created_at: string
           id: number
           organization: string | null
+          role: Database["public"]["Enums"]["role"] | null
+          type: Database["public"]["Enums"]["user_type"] | null
           user: string | null
         }
         Insert: {
           created_at?: string
           id?: number
           organization?: string | null
+          role?: Database["public"]["Enums"]["role"] | null
+          type?: Database["public"]["Enums"]["user_type"] | null
           user?: string | null
         }
         Update: {
           created_at?: string
           id?: number
           organization?: string | null
+          role?: Database["public"]["Enums"]["role"] | null
+          type?: Database["public"]["Enums"]["user_type"] | null
           user?: string | null
         }
         Relationships: [
@@ -456,6 +459,38 @@ export interface Database {
           },
           {
             foreignKeyName: "user_organizations_user_fkey"
+            columns: ["user"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      user_trades: {
+        Row: {
+          created_at: string
+          id: number
+          licensed: boolean | null
+          trade_name: string | null
+          user: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          licensed?: boolean | null
+          trade_name?: string | null
+          user?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          licensed?: boolean | null
+          trade_name?: string | null
+          user?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_trades_user_fkey"
             columns: ["user"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -538,6 +573,7 @@ export interface Database {
       }
     }
     Enums: {
+      role: "admin" | "billing" | "viewer"
       role_enum: "contractor" | "client"
       user_type: "supplier" | "vendor" | "client"
     }

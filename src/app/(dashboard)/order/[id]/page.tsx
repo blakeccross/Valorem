@@ -49,8 +49,9 @@ export default function Page({ params }: { params: { id: string } }) {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId") || "";
   const selectedTab = searchParams.get("view") || "details";
-  const { user, SignOut } = useContext(UserContext);
+  const { user, organization } = useContext(UserContext);
   const router = useRouter();
+  const currentOrganization = user.user_organizations.find((org) => organization.id === org.organization);
 
   useEffect(() => {
     getProducts();
@@ -268,7 +269,7 @@ export default function Page({ params }: { params: { id: string } }) {
               </Accordion.Panel>
             </Accordion>
 
-            {user.type !== "contractor" && order?.change_order && (
+            {currentOrganization?.type === "client" && order?.change_order && (
               <div className="flex flex-row justify-end gap-4 mt-4">
                 <Button outline color="red" className="h-fit">
                   <MdClose size={20} />

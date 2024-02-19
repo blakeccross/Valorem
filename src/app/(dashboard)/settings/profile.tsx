@@ -18,10 +18,10 @@ export default function Profile() {
   const { user, SignOut } = useContext(UserContext);
 
   useEffect(() => {
-    setEmail(user?.email);
-    setFirstName(user?.first_name);
-    setLastName(user?.last_name);
-    setPhone(user?.phone);
+    setEmail(user?.email || "");
+    setFirstName(user?.first_name || "");
+    setLastName(user?.last_name || "");
+    setPhone(user?.phone || "");
   }, [user]);
 
   const handleSubmitChanges = async () => {

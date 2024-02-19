@@ -16,7 +16,7 @@ export default function AddEventModal({ products, orderId }: { products: Product
   const [showModal, setShowModal] = useState<boolean>(false);
   const [type, setType] = useState<string>("");
   const [startDate, setStartDate] = useState<string>(new Date().toDateString());
-  const { user, SignOut } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const router = useRouter();
 
   async function handleScheduleEvent() {

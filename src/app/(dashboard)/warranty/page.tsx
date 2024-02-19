@@ -17,7 +17,8 @@ export default function Page() {
   const [warranties, setWarranties] = useState<Warranty[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [viewHistory, setViewHistory] = useState<number | null>(null);
-  const { user, SignOut } = useContext(UserContext);
+  const { user, organization } = useContext(UserContext);
+  const currentOrganization = user.user_organizations.find((org) => organization.id === org.organization);
 
   useEffect(() => {
     getWarrenties();
@@ -38,7 +39,7 @@ export default function Page() {
     <section className="p-5">
       <div className="flex justify-between mb-8">
         <h2 className="mb-8 text-4xl font-bold text-gray-900 dark:text-white">Warranties</h2>
-        {user?.type === "client" && <NewWarrantyModal showModal={showModal} setShowModal={setShowModal} reload={getWarrenties} />}
+        {currentOrganization?.type === "client" && <NewWarrantyModal showModal={showModal} setShowModal={setShowModal} reload={getWarrenties} />}
       </div>
       <Table striped>
         <Table.Head>

@@ -5,15 +5,24 @@ import { Session, createClientComponentClient } from "@supabase/auth-helpers-nex
 
 import { Database } from "../../types/supabase";
 import { useRouter } from "next/navigation";
-type User = Database["public"]["Tables"]["profiles"]["Row"];
-type Orginizations = Database["public"]["Tables"]["organizations"]["Row"];
+type User = Database["public"]["Tables"]["profiles"]["Row"] & { user_organizations: User_Organizations[] };
+type User_Organizations = Database["public"]["Tables"]["user_organizations"]["Row"];
+type Orginization = Database["public"]["Tables"]["organizations"]["Row"];
+type UserContext = {
+  user: User;
+  organization: Orginization;
+  setOrganization: (value: Orginization) => void;
+  allOrganizations: Orginization[];
+  SignOut: () => Promise<void>;
+};
 
-export const UserContext = createContext<any | null>(null);
+export const UserContext = createContext<UserContext>({} as UserContext);
 
-export default function UserProvider({ children }: { children: React.ReactNode }) {
+export default function UserProvider({ children }: { children: JSX.Element[] }) {
   const supabase = createClientComponentClient<Database>();
-  const [user, setUser] = useState<User | null>(null);
-  const [organizations, setOrganizations] = useState<Orginizations[]>([]);
+  const [user, setUser] = useState<User>();
+  const [organization, setOrganization] = useState<Orginization>();
+  const [allOrganizations, setAllOrganizations] = useState<Orginization[]>([]);
   const [session, setSession] = useState<Session | null>(null);
   const router = useRouter();
 
@@ -30,7 +39,7 @@ export default function UserProvider({ children }: { children: React.ReactNode }
   async function handleGetUser() {
     let { data: user, error } = await supabase
       .from("profiles")
-      .select("*")
+      .select("*, user_organizations!inner(*)")
       .eq("id", session?.user.id || "")
       .single();
     if (user) {
@@ -47,11 +56,12 @@ export default function UserProvider({ children }: { children: React.ReactNode }
       .select("organizations(*)")
       .eq("user", session?.user.id || "");
     if (orgs) {
-      let formattedOrganizations: Orginizations[] = orgs
+      let formattedOrganizations: Orginization[] = orgs
         .flatMap((item) => item.organizations || []) // Flatten and filter out null values
         .filter(Boolean);
 
-      setOrganizations(formattedOrganizations);
+      setOrganization(formattedOrganizations[0]);
+      setAllOrganizations(orgs.flatMap((item) => item.organizations || []));
     }
     if (error) {
       console.log(error);
@@ -63,7 +73,7 @@ export default function UserProvider({ children }: { children: React.ReactNode }
     if (error) {
       alert(error.message);
     } else {
-      setUser(null);
+      setUser(undefined);
       router.push("/");
     }
   }
@@ -85,5 +95,8 @@ export default function UserProvider({ children }: { children: React.ReactNode }
     };
   }, []);
 
-  return <UserContext.Provider value={{ user, organizations, SignOut }}>{children}</UserContext.Provider>;
+  return (
+    user &&
+    organization && <UserContext.Provider value={{ user, organization, setOrganization, allOrganizations, SignOut }}>{children}</UserContext.Provider>
+  );
 }

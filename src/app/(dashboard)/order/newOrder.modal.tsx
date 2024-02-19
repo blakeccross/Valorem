@@ -32,7 +32,7 @@ export default function NewOrderModal({ showModal, setShowModal }: { showModal: 
   // const [size, setSize] = useState<number>(0);
   // const [description, setDescription] = useState<string>("");
   const router = useRouter();
-  const { user, organizations } = useContext(UserContext);
+  const { user, organization } = useContext(UserContext);
   const {
     register,
     handleSubmit,
@@ -53,7 +53,7 @@ export default function NewOrderModal({ showModal, setShowModal }: { showModal: 
           size: data.size,
           trade: data.trade,
           access_instructions: data.access,
-          organization: organizations[0].id,
+          organization: organization.id,
         },
       ])
       .select()

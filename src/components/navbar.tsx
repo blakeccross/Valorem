@@ -18,7 +18,7 @@ type User = Database["public"]["Tables"]["profiles"]["Row"];
 export default function NavbarWithDropdown() {
   const supabase = createClientComponentClient<Database>();
   const router = useRouter();
-  // const { user, SignOut } = useContext(UserContext);
+  const { user, organization, setOrganization, allOrganizations } = useContext(UserContext);
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
@@ -49,11 +49,32 @@ export default function NavbarWithDropdown() {
             {session ? (
               <>
                 <ul className="hidden flex-col justify-center mt-0 w-full text-sm font-medium text-gray-500 md:flex-row dark:text-gray-400 md:flex items-center">
-                  {/* <li className="block border-b dark:border-gray-700 md:inline md:border-b-0">
-                    <Link href={"/order"} className="block py-3 px-4 rounded-lg hover:text-gray-900 dark:hover:text-white">
-                      <PiHammer size={20} />
-                    </Link>
-                  </li> */}
+                  <li className="block border-b dark:border-gray-700 md:inline md:border-b-0">
+                    <div className="block px-3 rounded-lg hover:text-gray-900 dark:hover:text-white cursor-pointer">
+                      <Dropdown
+                        inline
+                        label=""
+                        placement="bottom"
+                        renderTrigger={() => (
+                          <span>
+                            <Button pill color="gray">
+                              {organization.name}
+                            </Button>
+                          </span>
+                        )}
+                        size={"sm"}
+                      >
+                        <Dropdown.Header>
+                          <span className="flex justify-center">Organizations</span>
+                        </Dropdown.Header>
+                        {allOrganizations.map((org) => (
+                          <Dropdown.Item onClick={() => setOrganization(org)} key={org.id}>
+                            {org.name}
+                          </Dropdown.Item>
+                        ))}
+                      </Dropdown>
+                    </div>
+                  </li>
                   <li className="block border-b dark:border-gray-700 md:inline md:border-b-0">
                     <div className="block py-3 px-3 rounded-lg hover:text-gray-900 dark:hover:text-white cursor-pointer">
                       <Dropdown

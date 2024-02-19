@@ -4,20 +4,14 @@ import { Timeline, Table, Badge, Dropdown, Select, TextInput, Spinner, Label, Ch
 import { useState, useEffect, useRef, Fragment, useContext } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../../types/supabase";
-import moment from "moment";
-import Link from "next/link";
-import { MergeOrdersbyKey } from "@/utils/commonUtils";
 import { BiSolidPackage, BiDotsVerticalRounded } from "react-icons/bi";
-import { TfiAngleDown, TfiAngleUp } from "react-icons/tfi";
 import { HiCheck, HiClock } from "react-icons/hi";
-import { useRouter } from "next/navigation";
-import { BiSortDown } from "react-icons/bi";
-import { UserContext } from "@/context/userContext";
 import { Markets } from "@/utils/defaults";
 import { FaHardHat, FaUser } from "react-icons/fa";
 import ConfirmationModal from "@/components/confirmation.modal";
 import AddUserModal from "./components/add-user-modal";
 import UserInfoDrawer from "./components/user-info-drawer";
+import { UserContext } from "@/context/userContext";
 type User = Database["public"]["Tables"]["profiles"]["Row"] & { user_organizations: User_Organizations[] };
 type User_Organizations = Database["public"]["Tables"]["user_organizations"]["Row"];
 
@@ -28,22 +22,20 @@ export default function UserTable({ user }: { user: User }) {
   const [showRemoveUserModal, setShowRemoveUserModal] = useState<boolean>(false);
   const [showUserDetailsDrawer, setShowUserDetailsDrawer] = useState<boolean>(false);
   const [searchInput, setSearchInput] = useState<string>("");
-  const [sortBy, setSortBy] = useState<"project_name" | "start_date">("project_name");
+  const [market, setMarket] = useState<string>("");
   const selectedUser = useRef<User>();
-  const organization = user.user_organizations[0];
+  // const organization = user.user_organizations[0];
+  const { organization } = useContext(UserContext);
 
   useEffect(() => {
-    getUsers();
-  }, [searchInput]);
+    getUserTable();
+  }, [searchInput, market, organization.id]);
 
-  async function getUsers() {
+  async function getUserTable() {
     setTableIsLoading(true);
-    let searchUsers = supabase
-      .from("profiles")
-      .select("*, user_organizations!inner(*)")
-      .eq("user_organizations.organization", user.user_organizations[0].organization || 0);
+    let searchUsers = supabase.from("profiles").select("*, user_organizations!inner(*)").eq("user_organizations.organization", organization.id);
     if (searchInput) searchUsers.textSearch("first_name", searchInput);
-    // searchOrders.eq("organization", selectedOrginization);
+    if (market) searchUsers.or(`markets.cs.{${market}}`);
 
     await searchUsers.then(({ data: users, error }) => {
       if (error) {
@@ -60,32 +52,50 @@ export default function UserTable({ user }: { user: User }) {
     let { data, error } = await supabase
       .from("user_organizations")
       .delete()
-      .eq("id", selectedUser.current?.user_organizations.find((value) => value.organization === organization.organization)?.id || "")
+      .eq("id", selectedUser.current?.user_organizations.find((value) => value.organization === organization.id)?.id || "")
       .select();
     if (data) {
       setShowRemoveUserModal(false);
-      getUsers();
+      getUserTable();
     }
   }
 
-  function AccountType({ type }: { type: string }) {
+  function AccountType({ user }: { user: User }) {
+    const type = user.user_organizations.find((org) => org.organization === organization.id)?.type;
+    const role = user.user_organizations.find((org) => org.organization === organization.id)?.role;
     switch (type) {
       case "client":
-        return (
-          <Badge size="xs" color="blue" className="justify-center w-fit" icon={FaUser}>
-            Client
-          </Badge>
-        );
+        switch (role) {
+          case "admin":
+            return (
+              <Badge size="xs" color="blue" className="justify-center w-fit" icon={FaUser}>
+                Admin
+              </Badge>
+            );
+          case "billing":
+            return (
+              <Badge size="xs" color="green" className="justify-center w-fit" icon={FaUser}>
+                Billing
+              </Badge>
+            );
+          case "viewer":
+            return (
+              <Badge size="xs" color="indigo" className="justify-center w-fit" icon={FaUser}>
+                Viewer
+              </Badge>
+            );
+          default:
+            return (
+              <Badge size="xs" color="gray" className="justify-center w-fit">
+                {type}
+              </Badge>
+            );
+        }
+
       case "vendor":
         return (
           <Badge size="xs" color="success" className="justify-center w-fit" icon={HiCheck}>
             Vendor
-          </Badge>
-        );
-      case "admin":
-        return (
-          <Badge size="xs" color="cyan" className="justify-center w-fit" icon={HiClock}>
-            Admin
           </Badge>
         );
       case "supplier":
@@ -120,7 +130,7 @@ export default function UserTable({ user }: { user: User }) {
             <div className="mb-2 block">
               <Label htmlFor="market" value="Market" />
             </div>
-            <Select id="market" required>
+            <Select id="market" value={market} onChange={(e) => setMarket(e.target.value)}>
               {Markets.map((item) => (
                 <option value={item} key={item}>
                   {item}
@@ -137,7 +147,7 @@ export default function UserTable({ user }: { user: User }) {
             <Dropdown.Item onClick={() => setSortBy("start_date")}>Starting Date</Dropdown.Item>
           </Dropdown> */}
         </div>
-        <AddUserModal />
+        <AddUserModal reloadTable={getUserTable} />
       </div>
       {tableIsLoading ? (
         <div className=" ml-auto mr-auto mt-72 text-center">
@@ -146,9 +156,9 @@ export default function UserTable({ user }: { user: User }) {
       ) : users && users.length !== 0 ? (
         <Table striped className="w-full">
           <Table.Head>
-            <Table.HeadCell>
+            {/* <Table.HeadCell>
               <Checkbox />
-            </Table.HeadCell>
+            </Table.HeadCell> */}
             <Table.HeadCell>Name</Table.HeadCell>
             <Table.HeadCell>Role</Table.HeadCell>
             <Table.HeadCell>Market</Table.HeadCell>
@@ -160,14 +170,14 @@ export default function UserTable({ user }: { user: User }) {
               users.map((user) => (
                 <Fragment key={user.id}>
                   <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={user.id}>
-                    <Table.Cell>
+                    {/* <Table.Cell>
                       <Checkbox />
-                    </Table.Cell>
+                    </Table.Cell> */}
                     <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                       {`${user.first_name} ${user.last_name}`}
                     </Table.Cell>
                     <Table.Cell>
-                      <AccountType type={user.type} />
+                      <AccountType user={user} />
                     </Table.Cell>
                     <Table.Cell>{user.markets && user.markets.join(", ")}</Table.Cell>
                     <Table.Cell className="truncate">{user.email}</Table.Cell>

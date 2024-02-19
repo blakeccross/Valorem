@@ -19,8 +19,9 @@ export default function Settings({ order }: { order: Order }) {
   const [size, setSize] = useState<number>(0);
   const [description, setDescription] = useState<string>("");
   const [accessInstructions, setAccessInstructions] = useState<string>("");
-  const { user } = useContext(UserContext);
+  const { user, organization } = useContext(UserContext);
   const router = useRouter();
+  const currentOrganization = user.user_organizations.find((org) => organization.id === org.organization);
 
   useEffect(() => {
     if (order) {
@@ -77,7 +78,7 @@ export default function Settings({ order }: { order: Order }) {
             required
             value={trade}
             onChange={(e) => setTrade(e.target.value)}
-            disabled={user.type === "vendor" || user.type === "supplier"}
+            disabled={currentOrganization?.type === "vendor" || currentOrganization?.type === "supplier"}
           >
             <option disabled></option>
             <option>Exterior / Landscaping</option>
@@ -102,7 +103,7 @@ export default function Settings({ order }: { order: Order }) {
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            disabled={user.type === "vendor" || user.type === "supplier"}
+            // disabled={user.type === "vendor" || user.type === "supplier"}
           />
         </div>
         <div>
@@ -128,7 +129,7 @@ export default function Settings({ order }: { order: Order }) {
             type="number"
             value={size}
             onChange={(e) => setSize(e.target.valueAsNumber)}
-            disabled={user.type === "vendor" || user.type === "supplier"}
+            disabled={currentOrganization?.type === "vendor" || currentOrganization?.type === "supplier"}
           />
         </div>
         <div>
@@ -151,7 +152,7 @@ export default function Settings({ order }: { order: Order }) {
             rows={4}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            disabled={user.type === "vendor" || user.type === "supplier"}
+            disabled={currentOrganization?.type === "vendor" || currentOrganization?.type === "supplier"}
           />
         </div>
 
