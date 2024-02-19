@@ -5,6 +5,7 @@ import { Session, createClientComponentClient } from "@supabase/auth-helpers-nex
 
 import { Database } from "../../types/supabase";
 import { useRouter } from "next/navigation";
+import useLocalStorage from "@/utils/useLocalStorage";
 type User = Database["public"]["Tables"]["profiles"]["Row"] & { user_organizations: User_Organizations[] };
 type User_Organizations = Database["public"]["Tables"]["user_organizations"]["Row"];
 type Orginization = Database["public"]["Tables"]["organizations"]["Row"];
@@ -20,10 +21,12 @@ export const UserContext = createContext<UserContext>({} as UserContext);
 
 export default function UserProvider({ children }: { children: JSX.Element[] }) {
   const supabase = createClientComponentClient<Database>();
-  const [user, setUser] = useState<User>();
+  // const [user, setUser] = useState<User>();
+  const [user, setUser] = useLocalStorage("currentUser", {} as User);
+  // const [organization, setOrganization] = useLocalStorage("currentUserOrganizations", {} as Orginization);
   const [organization, setOrganization] = useState<Orginization>();
   const [allOrganizations, setAllOrganizations] = useState<Orginization[]>([]);
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<Session>();
   const router = useRouter();
 
   async function handleGetSession() {
@@ -33,6 +36,8 @@ export default function UserProvider({ children }: { children: JSX.Element[] }) 
     } = await supabase.auth.getSession();
     if (session) {
       setSession(session);
+      handleGetUser();
+      handleGetOrganizations();
     }
   }
 
@@ -73,10 +78,14 @@ export default function UserProvider({ children }: { children: JSX.Element[] }) 
     if (error) {
       alert(error.message);
     } else {
-      setUser(undefined);
+      // setUser(undefined);
       router.push("/");
     }
   }
+
+  // useEffect(() => {
+  //   handleGetSession();
+  // }, []);
 
   useEffect(() => {
     if (session) {
@@ -88,7 +97,7 @@ export default function UserProvider({ children }: { children: JSX.Element[] }) 
   useEffect(() => {
     handleGetSession();
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event == "SIGNED_IN") setSession(session);
+      if (event == "SIGNED_IN") handleGetSession();
     });
     return () => {
       listener.subscription.unsubscribe();
@@ -96,7 +105,6 @@ export default function UserProvider({ children }: { children: JSX.Element[] }) 
   }, []);
 
   return (
-    user &&
     organization && <UserContext.Provider value={{ user, organization, setOrganization, allOrganizations, SignOut }}>{children}</UserContext.Provider>
   );
 }

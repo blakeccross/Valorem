@@ -16,7 +16,6 @@ type Event = Database["public"]["Tables"]["events"]["Row"] & {
 type ProductArray = [Product];
 import { HiCheck } from "react-icons/hi";
 import { AiOutlineCloudUpload } from "react-icons/ai";
-import { UserContext } from "@/context/userContext";
 import { v4 as uuidv4 } from "uuid";
 type Image = { data: File; url: string };
 type ImgUrl = { publicUrl: string };
@@ -26,7 +25,6 @@ export default function Page({ params }: { params: { id: string } }) {
   const [event, setEvent] = useState<any>();
   const [products, setProducts] = useState<Product[]>([]);
   const [showToast, setShowToast] = useState(false);
-  const { user, SignOut } = useContext(UserContext);
 
   useEffect(() => {
     getProducts();
