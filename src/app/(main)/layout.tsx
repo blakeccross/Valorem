@@ -1,10 +1,9 @@
 import { FC, PropsWithChildren } from "react";
-import FlowbiteContext from "@/context/FlowbiteContext";
-import "../globals.css";
+import "@/app/globals.css";
 import NavbarWithDropdown from "@/components/navbar";
 import UserProvider from "@/context/userContext";
 import { Flowbite, ThemeModeScript } from "flowbite-react";
-import { flowbiteTheme } from "../theme";
+import { flowbiteTheme } from "@/app/theme";
 
 const RootLayout: FC<PropsWithChildren> = function ({ children }) {
   return (

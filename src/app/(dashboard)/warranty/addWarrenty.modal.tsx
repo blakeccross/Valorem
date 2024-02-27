@@ -52,7 +52,7 @@ export default function NewWarrantyModal({
             start_date: startDate.toDateString(),
             order_id: selectedOrder.id,
             period: period,
-            contractor_id: user.id,
+            contractor_id: user?.id,
           },
         ])
         .select()

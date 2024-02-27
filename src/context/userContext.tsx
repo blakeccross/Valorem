@@ -10,7 +10,7 @@ type User = Database["public"]["Tables"]["profiles"]["Row"] & { user_organizatio
 type User_Organizations = Database["public"]["Tables"]["user_organizations"]["Row"];
 type Orginization = Database["public"]["Tables"]["organizations"]["Row"];
 type UserContext = {
-  user: User;
+  user: User | undefined;
   organization: Orginization;
   setOrganization: (value: Orginization) => void;
   allOrganizations: Orginization[];
@@ -24,7 +24,7 @@ export default function UserProvider({ children }: { children: JSX.Element[] }) 
   // const [user, setUser] = useState<User>();
   const [user, setUser] = useLocalStorage("currentUser", {} as User);
   // const [organization, setOrganization] = useLocalStorage("currentUserOrganizations", {} as Orginization);
-  const [organization, setOrganization] = useState<Orginization>();
+  const [organization, setOrganization] = useState<Orginization>({} as Orginization);
   const [allOrganizations, setAllOrganizations] = useState<Orginization[]>([]);
   const [session, setSession] = useState<Session>();
   const router = useRouter();
@@ -36,8 +36,8 @@ export default function UserProvider({ children }: { children: JSX.Element[] }) 
     } = await supabase.auth.getSession();
     if (session) {
       setSession(session);
-      handleGetUser();
-      handleGetOrganizations();
+      // handleGetUser();
+      // handleGetOrganizations();
     }
   }
 
@@ -79,7 +79,7 @@ export default function UserProvider({ children }: { children: JSX.Element[] }) 
       alert(error.message);
     } else {
       // setUser(undefined);
-      router.push("/");
+      router.refresh();
     }
   }
 
@@ -104,7 +104,5 @@ export default function UserProvider({ children }: { children: JSX.Element[] }) 
     };
   }, []);
 
-  return (
-    organization && <UserContext.Provider value={{ user, organization, setOrganization, allOrganizations, SignOut }}>{children}</UserContext.Provider>
-  );
+  return <UserContext.Provider value={{ user, organization, setOrganization, allOrganizations, SignOut }}>{children}</UserContext.Provider>;
 }

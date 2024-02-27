@@ -29,7 +29,7 @@ export default function Notifications() {
     let { data: notifications, error } = await supabase
       .from("notifications")
       .select("*, notifier(id, first_name, last_name, avatar_url)")
-      .eq("user", user.id);
+      .eq("user", user?.id || "");
     if (notifications) {
       setNotifications(notifications);
     }

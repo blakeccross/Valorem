@@ -26,7 +26,7 @@ export default function AddEventModal({ products, orderId }: { products: Product
         {
           type: type,
           date_time: startDate,
-          contractor_id: user.id,
+          contractor_id: user?.id,
           order_id: Number(orderId),
         },
       ])

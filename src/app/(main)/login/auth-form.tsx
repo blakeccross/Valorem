@@ -3,7 +3,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Database } from "../../../../types/supabase";
-import { Button, Checkbox, Label, TextInput } from "flowbite-react";
+import { Button, Checkbox, Label, Spinner, TextInput } from "flowbite-react";
 
 export default function AuthForm() {
   const [email, setEmail] = useState("");
@@ -15,12 +15,15 @@ export default function AuthForm() {
 
   const handleSignIn = async () => {
     setIsloading(true);
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    if (data) {
-      router.refresh();
+    if (user) {
+      router.push("/dashboard");
     }
     if (error?.message === "Email not confirmed") {
       alert(error.message);
@@ -28,8 +31,8 @@ export default function AuthForm() {
     }
     if (error) {
       alert(error.message);
+      setIsloading(false);
     }
-    setIsloading(false);
   };
 
   return (
@@ -71,12 +74,12 @@ export default function AuthForm() {
                 <Label htmlFor="remember">Remember me</Label>
               </div>
             </div> */}
-            <a href="/forgot" className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">
+            <a href="/forgot" className="text-sm font-medium text-primary-600 hover:underline dark:text-white">
               Forgot password?
             </a>
           </div>
-          <Button className="w-full" onClick={handleSignIn} isProcessing={isLoading}>
-            {!isLoading && "Sign in to your account"}
+          <Button className="w-full" onClick={handleSignIn}>
+            {isLoading ? <Spinner /> : "Sign in to your account"}
           </Button>
         </form>
       </div>

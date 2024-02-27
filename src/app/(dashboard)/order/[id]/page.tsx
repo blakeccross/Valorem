@@ -51,7 +51,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const selectedTab = searchParams.get("view") || "details";
   const { user, organization } = useContext(UserContext);
   const router = useRouter();
-  const currentOrganization = user.user_organizations.find((org) => organization.id === org.organization);
+  const currentOrganization = user?.user_organizations?.find((org) => organization.id === org.organization);
 
   useEffect(() => {
     getProducts();

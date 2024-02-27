@@ -38,7 +38,7 @@ export default function ClientView() {
   const router = useRouter();
   const { user, organization, allOrganizations } = useContext(UserContext);
   const [selectedOrginization, setSelectedOrginization] = useState<string>("");
-  const currentOrganization = user.user_organizations.find((org) => organization.id === org.organization);
+  const currentOrganization = user?.user_organizations?.find((org) => organization.id === org.organization);
 
   // useEffect(() => {
   //   if (allOrganizations.length > 0) {

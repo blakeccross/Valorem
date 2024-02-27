@@ -50,7 +50,7 @@ export default function Profile() {
     const { data, error } = await supabase
       .from("profiles")
       .update({ email: email, first_name: firstName, last_name: lastName, phone: phone })
-      .eq("id", user.id)
+      .eq("id", user?.id || "")
       .select();
     if (data) {
       router.refresh();

@@ -18,7 +18,7 @@ export default function Page() {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [viewHistory, setViewHistory] = useState<number | null>(null);
   const { user, organization } = useContext(UserContext);
-  const currentOrganization = user.user_organizations.find((org) => organization.id === org.organization);
+  const currentOrganization = user?.user_organizations?.find((org) => organization.id === org.organization);
 
   useEffect(() => {
     getWarrenties();

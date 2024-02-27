@@ -1,6 +1,6 @@
 "use client";
 import { useContext, useEffect, useState } from "react";
-import { Dropdown, Navbar, Avatar, Button } from "flowbite-react";
+import { Dropdown, Navbar, Avatar, Button, Spinner } from "flowbite-react";
 import { Session, createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../types/supabase";
 import { useRouter } from "next/navigation";
@@ -18,14 +18,16 @@ type User = Database["public"]["Tables"]["profiles"]["Row"];
 export default function NavbarWithDropdown() {
   const supabase = createClientComponentClient<Database>();
   const router = useRouter();
-  const { user, organization, setOrganization, allOrganizations } = useContext(UserContext);
+  const { user, organization, setOrganization, allOrganizations, SignOut } = useContext(UserContext);
   const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     handleGetSession();
   }, []);
 
   async function handleGetSession() {
+    setIsLoading(true);
     const {
       data: { session },
       error,
@@ -33,6 +35,7 @@ export default function NavbarWithDropdown() {
     if (session) {
       setSession(session);
     }
+    setIsLoading(false);
   }
 
   return (
@@ -46,7 +49,9 @@ export default function NavbarWithDropdown() {
             </Link>
           </div>
           <div className="flex flex-shrink-0 justify-between items-center ml-4 lg:order-2">
-            {session ? (
+            {isLoading ? (
+              <Spinner />
+            ) : session ? (
               <>
                 <ul className="hidden flex-col justify-center mt-0 w-full text-sm font-medium text-gray-500 md:flex-row dark:text-gray-400 md:flex items-center">
                   <li className="block border-b dark:border-gray-700 md:inline md:border-b-0">
@@ -67,11 +72,13 @@ export default function NavbarWithDropdown() {
                         <Dropdown.Header>
                           <span className="flex justify-center">Organizations</span>
                         </Dropdown.Header>
-                        {allOrganizations.map((org) => (
-                          <Dropdown.Item onClick={() => setOrganization(org)} key={org.id}>
-                            {org.name}
-                          </Dropdown.Item>
-                        ))}
+                        {allOrganizations &&
+                          allOrganizations.length > 1 &&
+                          allOrganizations.map((org) => (
+                            <Dropdown.Item onClick={() => setOrganization(org)} key={org.id}>
+                              {org.name}
+                            </Dropdown.Item>
+                          ))}
                       </Dropdown>
                     </div>
                   </li>
@@ -194,7 +201,7 @@ export default function NavbarWithDropdown() {
                     </Dropdown.Header>
                     <Dropdown.Item href="/settings">Settings</Dropdown.Item>
                     <Dropdown.Divider />
-                    {/* <Dropdown.Item onClick={SignOut}>Sign out</Dropdown.Item> */}
+                    <Dropdown.Item onClick={SignOut}>Sign out</Dropdown.Item>
                   </Dropdown>
                 </div>
               </>
