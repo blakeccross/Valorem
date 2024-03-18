@@ -100,3 +100,24 @@ export const states = [
   "WI",
   "WY",
 ];
+
+export const Trades = [
+  "Carpentry",
+  "Masonry",
+  "Electrical",
+  "Plumbing",
+  "HVAC",
+  "Painting",
+  "Roofing",
+  "Concrete Work",
+  "Drywall and Plastering",
+  "Flooring",
+  "Ironworking",
+  "Insulation",
+  "Landscaping",
+  "Demolition",
+  "Surveying",
+  "General Contracting",
+  "Handyman",
+  "Mitigation",
+];

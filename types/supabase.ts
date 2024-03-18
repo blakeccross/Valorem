@@ -75,6 +75,57 @@ export type Database = {
         }
         Relationships: []
       }
+      conversation_users: {
+        Row: {
+          conversation: number | null
+          created_at: string
+          id: number
+          user: string
+        }
+        Insert: {
+          conversation?: number | null
+          created_at?: string
+          id?: number
+          user: string
+        }
+        Update: {
+          conversation?: number | null
+          created_at?: string
+          id?: number
+          user?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_conversation_users_conversation_fkey"
+            columns: ["conversation"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_conversation_users_user_fkey"
+            columns: ["user"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      conversations: {
+        Row: {
+          created_at: string
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           contractor_id: string | null
@@ -164,6 +215,45 @@ export type Database = {
           SKU?: string | null
         }
         Relationships: []
+      }
+      messages: {
+        Row: {
+          conversation: number | null
+          created_at: string
+          id: number
+          sent_by_user: string | null
+          text: string | null
+        }
+        Insert: {
+          conversation?: number | null
+          created_at?: string
+          id?: number
+          sent_by_user?: string | null
+          text?: string | null
+        }
+        Update: {
+          conversation?: number | null
+          created_at?: string
+          id?: number
+          sent_by_user?: string | null
+          text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_messages_conversation_fkey"
+            columns: ["conversation"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_messages_sent_by_user_fkey"
+            columns: ["sent_by_user"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       notifications: {
         Row: {
@@ -423,6 +513,41 @@ export type Database = {
           phone?: string | null
         }
         Relationships: []
+      }
+      "skill-trades": {
+        Row: {
+          created_at: string
+          expiration_date: string | null
+          id: number
+          is_licensed: boolean
+          name: string | null
+          user: string | null
+        }
+        Insert: {
+          created_at?: string
+          expiration_date?: string | null
+          id?: number
+          is_licensed: boolean
+          name?: string | null
+          user?: string | null
+        }
+        Update: {
+          created_at?: string
+          expiration_date?: string | null
+          id?: number
+          is_licensed?: boolean
+          name?: string | null
+          user?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_skill-trades_user_fkey"
+            columns: ["user"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       user_organizations: {
         Row: {

@@ -18,9 +18,9 @@ type User = Database["public"]["Tables"]["profiles"]["Row"];
 export default function NavbarWithDropdown() {
   const supabase = createClientComponentClient<Database>();
   const router = useRouter();
-  const { user, organization, setOrganization, allOrganizations, SignOut } = useContext(UserContext);
+  const { user, organization, setOrganization, allOrganizations } = useContext(UserContext);
   const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     handleGetSession();
@@ -36,6 +36,18 @@ export default function NavbarWithDropdown() {
       setSession(session);
     }
     setIsLoading(false);
+  }
+
+  async function handleSignOut() {
+    let { error } = await supabase.auth.signOut();
+    if (error) {
+      alert(error.message);
+    } else {
+      setSession(null);
+      // handleGetSession();
+      // console.log("SESSION HERE", session);
+      // router.replace("/");
+    }
   }
 
   return (
@@ -201,7 +213,7 @@ export default function NavbarWithDropdown() {
                     </Dropdown.Header>
                     <Dropdown.Item href="/settings">Settings</Dropdown.Item>
                     <Dropdown.Divider />
-                    <Dropdown.Item onClick={SignOut}>Sign out</Dropdown.Item>
+                    <Dropdown.Item onClick={handleSignOut}>Sign out</Dropdown.Item>
                   </Dropdown>
                 </div>
               </>

@@ -98,6 +98,9 @@ export default function UserProvider({ children }: { children: JSX.Element[] }) 
     handleGetSession();
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event == "SIGNED_IN") handleGetSession();
+      if (event == "SIGNED_OUT") {
+        router.replace("/");
+      }
     });
     return () => {
       listener.subscription.unsubscribe();

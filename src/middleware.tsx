@@ -21,7 +21,14 @@ export async function middleware(req: NextRequest) {
   //   return NextResponse.redirect(new URL("/login", req.url));
   // }
 
-  if (!user && req.nextUrl.pathname === "/order") {
+  if (
+    !user &&
+    req.nextUrl.pathname !== "/" &&
+    req.nextUrl.pathname !== "/login" &&
+    req.nextUrl.pathname !== "/signup" &&
+    req.nextUrl.pathname !== "/forgot" &&
+    req.nextUrl.pathname !== "/update-password"
+  ) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
@@ -29,5 +36,14 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/login", "/dashboard", "/order", "/settings", "/inbox", "/users", "/notifications", "/calendar"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    "/((?!_next/static|_next/image|favicon.ico).*)",
+  ],
 };

@@ -1,11 +1,11 @@
 "use client";
 
 import { useFormState, FormProvider } from "./components/formState";
-import AuthForm from "./components/auth-form";
+import AuthForm from "./components/account-info";
 import CompanyForm from "./components/company-form";
-import SignupProgress from "./components/signupProgress";
+import SignupProgress from "./components/signup-progress";
 import Confirmation from "./components/confirmation";
-import AccountType from "./components/accountType";
+import AccountType from "./components/account-type";
 import VerifyEmail from "./components/verifyEmail";
 
 function ActiveStepFormComponent() {

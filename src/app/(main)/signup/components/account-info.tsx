@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Database } from "../../../../../types/supabase";
 import { Button, Checkbox, Label, TextInput, Select } from "flowbite-react";
 import ConfirmationModal from "@/components/confirmation.modal";
-import SignupProgress from "./signupProgress";
+import SignupProgress from "./signup-progress";
 import { useForm } from "react-hook-form";
 import { useFormState } from "./formState";
 
@@ -71,8 +71,8 @@ export default function AuthForm() {
   return (
     <form onSubmit={onSubmit} className="w-full place-self-center lg:col-span-6">
       <div className="w-full place-self-center lg:col-span-6">
-        <div className="mx-auto rounded-lg bg-white p-6 shadow dark:bg-gray-800 sm:max-w-xl sm:p-8">
-          <h1 className="mb-2 text-2xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white">Request Access</h1>
+        <div className="">
+          <h1 className="mb-2 text-2xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white">Account Info</h1>
           <p className="text-sm font-light text-gray-500 dark:text-gray-300">Fill out this form to request access to Valorem.</p>
           <div className="mt-4 space-y-6 sm:mt-6">
             <div className="grid gap-6 sm:grid-rows-2">

@@ -61,17 +61,10 @@ export default function Confirmation() {
     }
   }
 
-  // async function setUserType(userId: string) {
-  //   const { data, error } = await supabase.from("profiles").update({ type: formData.accountType }).eq("id", userId).select();
-
-  //   if (error) alert(error.message);
-  //   if (data) router.refresh();
-  // }
-
   async function handleAddUserToOrg(userId: string, organizationId: string) {
     const { data, error } = await supabase
       .from("user_organizations")
-      .insert([{ user: userId, organization: organizationId }])
+      .insert([{ user: userId, organization: organizationId, type: "client", role: "admin" }])
       .select();
 
     if (error) alert(error.message);
@@ -92,7 +85,7 @@ export default function Confirmation() {
   return (
     <form className="w-full place-self-center lg:col-span-6">
       <div>
-        <div className="mx-auto rounded-lg bg-white p-6 shadow dark:bg-gray-800 sm:max-w-xl sm:p-8">
+        <div className="">
           <h1 className="mb-2 text-2xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white">Confirmation</h1>
           <div className="grid grid-cols-2">
             <div>

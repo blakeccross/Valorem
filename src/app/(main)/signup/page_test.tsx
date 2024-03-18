@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import AuthForm from "./components/auth-form";
+import AuthForm from "./components/account-info";
 import CompanyForm from "./components/company-form";
-import SignupProgress from "./components/signupProgress";
+import SignupProgress from "./components/signup-progress";
 export default function Login() {
   const [formStep, setFormStep] = useState(0);
 
