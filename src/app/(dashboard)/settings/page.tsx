@@ -13,7 +13,7 @@ export default function Settings() {
   const supabase = createClientComponentClient<Database>();
 
   return (
-    <section className="bg-gray-50 dark:bg-gray-900">
+    <section className="bg-gray-50 dark:bg-gray-900 w-full">
       <div className="mx-auto grid max-w-screen-xl px-4 py-8lg:gap-20 lg:py-16">
         <div className="w-full place-self-center lg:col-span-6">
           <div className="flex mb-6">

@@ -92,11 +92,18 @@ export default function CompanyForm() {
                     multiple
                     limitTags={2}
                     id="multiple-limit-tags"
+                    disableCloseOnSelect
                     options={Markets}
                     getOptionLabel={(option) => option}
                     onChange={(e, data) => onChange(data)}
                     value={value}
                     size="small"
+                    renderOption={(props, option, { selected }) => (
+                      <li {...props}>
+                        <Checkbox id="remember" checked={selected} className="mr-2" />
+                        {option}
+                      </li>
+                    )}
                     renderInput={(params) => (
                       // <TextInput {...params} size={1} />
                       // <div ref={params.InputProps.ref}>
@@ -105,7 +112,7 @@ export default function CompanyForm() {
                       <TextField
                         {...params}
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 p-10"
-                        error={fieldState?.invalid || value.length < 1}
+                        error={fieldState?.invalid || value?.length < 1}
                         helperText={fieldState?.invalid && "Please select at least 5 markets."}
                       />
                     )}

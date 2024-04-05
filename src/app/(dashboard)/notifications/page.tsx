@@ -38,7 +38,7 @@ export default function Notifications() {
 
   return (
     <>
-      <section className="p-5">
+      <section className="p-5 w-full">
         <h2 className="mb-2 text-4xl font-bold text-gray-900 dark:text-white">Notifications</h2>
         {notifications.map((noti) => (
           <div className="flex flex-1 justify-between items-center" key={noti.id}>

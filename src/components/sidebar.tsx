@@ -7,7 +7,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useContext, useEffect } from "react";
 import { HiArrowSmRight, HiChartPie, HiInbox, HiOutlineClipboardList, HiBell, HiTable, HiUser, HiViewBoards, HiCalendar } from "react-icons/hi";
 import { HiBolt } from "react-icons/hi2";
-import { RiSettings3Fill } from "react-icons/ri";
+import { RiMoneyDollarBoxLine, RiSettings3Fill } from "react-icons/ri";
+import { TbDeviceIpadDollar } from "react-icons/tb";
 
 export default function SidebarNav() {
   const { collapseSidebar, setCollapseSidebar } = useContext(SidebarContext);
@@ -53,6 +54,9 @@ export default function SidebarNav() {
           </Sidebar.Item>
           <Sidebar.Item as={Link} href="/calendar" icon={HiCalendar} active={pathname === "/calendar"} prefetch={false}>
             Calendar
+          </Sidebar.Item>
+          <Sidebar.Item as={Link} href="/invoices" icon={TbDeviceIpadDollar} active={pathname === "/invoices"} prefetch={false}>
+            Invoicing
           </Sidebar.Item>
           <Sidebar.Item as={Link} href="/settings" icon={RiSettings3Fill} active={pathname === "/settings"} prefetch={false}>
             Settings

@@ -114,7 +114,7 @@ export default function UserTable({ user }: { user: User }) {
   }
 
   return (
-    <section className="p-5">
+    <section className="p-5 w-full">
       <div className="flex justify-between mb-4">
         <h5 className="text-4xl font-bold text-gray-900 dark:text-white">Users</h5>
       </div>

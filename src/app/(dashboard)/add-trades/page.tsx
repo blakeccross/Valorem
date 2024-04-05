@@ -78,103 +78,108 @@ export default function AddTrades() {
   }
 
   return (
-    <div className="p-5 max-w-4xl place-self-center lg:col-span-6">
-      <div className="">
-        <h1 className="mb-2 text-2xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white">Add Trades</h1>
-        <p className="text-sm font-light text-gray-500 dark:text-gray-300">
-          By uploading and submitting your trade license, you agree and acknowledge that we reserve the right to verify the authenticity and validity
-          of the provided document. We may conduct checks to ensure compliance with regulatory requirements and internal policies. Submission of
-          false, expired, or misleading information may result in the rejection of your application and potential legal consequences.
-        </p>
-        <div className="mt-4 space-y-6 sm:mt-6">
-          <div>
-            <Label htmlFor="trades" value="Trades" />
+    <div className="p-5 lg:col-span-6 w-full">
+      <h1 className="mb-2 text-2xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white">Add Trades</h1>
+      <p className="text-sm font-light text-gray-500 dark:text-gray-300">
+        By uploading and submitting your trade license, you agree and acknowledge that we reserve the right to verify the authenticity and validity of
+        the provided document. We may conduct checks to ensure compliance with regulatory requirements and internal policies. Submission of false,
+        expired, or misleading information may result in the rejection of your application and potential legal consequences.
+      </p>
+      <div className="mt-4 space-y-6 sm:mt-6">
+        <div>
+          <Label htmlFor="trades" value="Trades" />
 
-            <Autocomplete
-              multiple
-              freeSolo
-              limitTags={2}
-              id="multiple-limit-tags"
-              options={Trades}
-              getOptionLabel={(option) => option}
-              onChange={(e, data) => setTrades(data.map((item) => ({ name: item, file: undefined, is_licensed: true })))}
-              value={trades?.map((item) => item.name)}
-              size="small"
-              sx={{
-                ".MuiAutocomplete-input": {
-                  backgroundColor: "transparent",
-                },
-              }}
-              renderTags={(tagValue, getTagProps) => {
-                return tagValue.map((option, index) => (
-                  <Badge
-                    {...getTagProps({ index })}
-                    icon={IoCloseCircle}
-                    color={"blue"}
-                    onClick={() => getTagProps({ index }).onDelete(index)}
-                    className="cursor-pointer mr-1"
-                    key={option}
-                  >
-                    {option}
-                  </Badge>
-                ));
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 p-0"
-                />
-              )}
-            />
-          </div>
+          <Autocomplete
+            multiple
+            freeSolo
+            limitTags={2}
+            id="multiple-limit-tags"
+            options={Trades}
+            getOptionLabel={(option) => option}
+            onChange={(e, data) => setTrades(data.map((item) => ({ name: item, file: undefined, is_licensed: true })))}
+            value={trades?.map((item) => item.name)}
+            size="small"
+            disableCloseOnSelect
+            renderOption={(props, option, { selected }) => (
+              <li {...props}>
+                <Checkbox id="remember" checked={selected} className="mr-2" />
+                {option}
+              </li>
+            )}
+            sx={{
+              ".MuiAutocomplete-input": {
+                backgroundColor: "transparent",
+              },
+            }}
+            renderTags={(tagValue, getTagProps) => {
+              return tagValue.map((option, index) => (
+                <Badge
+                  {...getTagProps({ index })}
+                  icon={IoCloseCircle}
+                  color={"blue"}
+                  onClick={() => getTagProps({ index }).onDelete(index)}
+                  className="cursor-pointer mr-1"
+                  key={option}
+                >
+                  {option}
+                </Badge>
+              ));
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 p-0"
+              />
+            )}
+          />
+        </div>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            {trades.sort(alphabeticalSorting)?.map((trade, index) => {
-              const fieldName = `trades[${index}]`;
-              setValue(`${index}.name`, trade.name);
-              const isChecked = watch(`${index}.is_licensed`);
-              return (
-                <fieldset name={fieldName} key={fieldName}>
-                  <div key={trade.name}>
-                    <div className="flex justify-between items-center mb-4">
-                      <Label htmlFor={trade.name} value={trade.name} {...register(`${index}.name`)} />
-                      <div>
-                        <Label htmlFor="expiration" value="Expiration Date" />
-                        <Controller
-                          name={`${index}.expiration_date`}
-                          control={control}
-                          render={({ field: { onChange, value } }) => (
-                            <Datepicker {...register(`${index}.expiration_date`)} required onSelectedDateChanged={onChange} value={value} />
-                          )}
-                        />
-                      </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {trades.sort(alphabeticalSorting)?.map((trade, index) => {
+            const fieldName = `trades[${index}]`;
+            setValue(`${index}.name`, trade.name);
+            const isChecked = watch(`${index}.is_licensed`);
+            return (
+              <fieldset name={fieldName} key={fieldName}>
+                <div key={trade.name}>
+                  <div className="flex justify-between items-center mb-4">
+                    <Label htmlFor={trade.name} value={trade.name} {...register(`${index}.name`)} />
+                    <div>
+                      <Label htmlFor="expiration" value="Expiration Date" />
+                      <Controller
+                        name={`${index}.expiration_date`}
+                        control={control}
+                        render={({ field: { onChange, value } }) => (
+                          <Datepicker {...register(`${index}.expiration_date`)} required onSelectedDateChanged={onChange} value={value} />
+                        )}
+                      />
                     </div>
-                    {!isChecked && <FileInput className="mb-4" {...register(`${index}.file`)} required />}
-                    {/* <label className="flex justify-center min-w-[300px] h-[300px] px-4 transition border-2 border-gray-300 border-dashed rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none bg-gray-100 dark:bg-gray-800">
+                  </div>
+                  {!isChecked && <FileInput className="mb-4" {...register(`${index}.file`)} required />}
+                  {/* <label className="flex justify-center min-w-[300px] h-[300px] px-4 transition border-2 border-gray-300 border-dashed rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none bg-gray-100 dark:bg-gray-800">
                 <span className="flex flex-col justify-center items-center space-x-2 ">
                   <AiOutlineCloudUpload size={25} color="rgb(75 85 99)" />
                   <span className="font-medium text-gray-600">Click here to upload your file or drag and drop</span>
                 </span>
                 <input type="file" name="file_upload" className="hidden" onChange={(e) => handleAddFile(e, trade.name)} />
               </label> */}
-                    <div className="flex items-center gap-2">
-                      <Checkbox {...register(`${index}.is_licensed`)} />
-                      <Label htmlFor="accept" className="flex">
-                        This trade is not licensed
-                      </Label>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox {...register(`${index}.is_licensed`)} />
+                    <Label htmlFor="accept" className="flex">
+                      This trade is not licensed
+                    </Label>
                   </div>
-                </fieldset>
-              );
-            })}
+                </div>
+              </fieldset>
+            );
+          })}
 
-            <div className="flex justify-end">
-              <Button type="submit" isProcessing={isUploading}>
-                Submit
-              </Button>
-            </div>
-          </form>
-        </div>
+          <div className="flex justify-end">
+            <Button type="submit" isProcessing={isUploading}>
+              Submit
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   );

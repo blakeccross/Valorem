@@ -156,7 +156,7 @@ export default function ClientView() {
   }
 
   return (
-    <section className="p-5">
+    <section className="p-5 w-full">
       <div className="flex justify-between mb-4">
         <h5 className="text-4xl font-bold text-gray-900 dark:text-white">Active Orders</h5>
         {currentOrganization?.type === "client" && <NewOrderModal showModal={showModal} setShowModal={setShowModal} />}

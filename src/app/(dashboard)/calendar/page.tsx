@@ -113,7 +113,7 @@ export default function Calenda() {
 
   return (
     <>
-      <section className="p-5">
+      <section className="p-5 w-full">
         <h2 className="mb-2 text-4xl font-bold text-gray-900 dark:text-white">Upcoming events</h2>
         <Calendar
           date={date.toString()}

@@ -77,7 +77,7 @@ export default function NewOrderModal({ showModal, setShowModal }: { showModal: 
           <form onSubmit={handleSubmit(handleCreateOrder)}>
             <div className="space-y-2">
               <h3 className="text-xl font-medium text-gray-900 dark:text-white">New Order</h3>
-              <div>
+              {/* <div>
                 <Label htmlFor="countries">Trade</Label>
                 <Select required {...register("trade")}>
                   <option disabled></option>
@@ -95,7 +95,7 @@ export default function NewOrderModal({ showModal, setShowModal }: { showModal: 
                   <option>Flooring</option>
                   <option>Other</option>
                 </Select>
-              </div>
+              </div> */}
               <div>
                 <Label>Project Name</Label>
                 <TextInput placeholder="Enter a name" {...register("name")} required />
