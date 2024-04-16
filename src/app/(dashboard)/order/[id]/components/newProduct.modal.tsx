@@ -37,11 +37,11 @@ export default function NewProductModal({
 
   function handleAddProduct() {
     let product = {
-      description: description,
-      quantity: quantity,
-      price: price || 0,
+      ItemId: { Description: description },
+      Qty: quantity,
+      Price: price || 0,
       size: size,
-      type: category || "",
+      Room: category || "",
       orderId: orderId,
       status: "new",
     };

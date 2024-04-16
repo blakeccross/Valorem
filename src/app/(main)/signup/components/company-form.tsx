@@ -92,12 +92,12 @@ export default function CompanyForm() {
                     multiple
                     limitTags={2}
                     id="multiple-limit-tags"
-                    disableCloseOnSelect
                     options={Markets}
                     getOptionLabel={(option) => option}
                     onChange={(e, data) => onChange(data)}
                     value={value}
                     size="small"
+                    disableCloseOnSelect
                     renderOption={(props, option, { selected }) => (
                       <li {...props}>
                         <Checkbox id="remember" checked={selected} className="mr-2" />

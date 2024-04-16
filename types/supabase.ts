@@ -227,6 +227,56 @@ export type Database = {
           },
         ]
       }
+      lineitems: {
+        Row: {
+          CostCategory: string | null
+          CostCode: number | null
+          created_at: string
+          Description: string | null
+          id: number
+          LineItemName: string
+          LineItemNameClean: string
+          MaterialId: number | null
+          Notes: string | null
+          Options: string | null
+          UOM: string | null
+        }
+        Insert: {
+          CostCategory?: string | null
+          CostCode?: number | null
+          created_at?: string
+          Description?: string | null
+          id?: number
+          LineItemName: string
+          LineItemNameClean: string
+          MaterialId?: number | null
+          Notes?: string | null
+          Options?: string | null
+          UOM?: string | null
+        }
+        Update: {
+          CostCategory?: string | null
+          CostCode?: number | null
+          created_at?: string
+          Description?: string | null
+          id?: number
+          LineItemName?: string
+          LineItemNameClean?: string
+          MaterialId?: number | null
+          Notes?: string | null
+          Options?: string | null
+          UOM?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_lineitems_MaterialId_fkey"
+            columns: ["MaterialId"]
+            isOneToOne: false
+            referencedRelation: "materials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Lowes_PriceHistory: {
         Row: {
           created_at: string
@@ -245,6 +295,48 @@ export type Database = {
           id?: number
           Price?: number | null
           SKU?: string | null
+        }
+        Relationships: []
+      }
+      materials: {
+        Row: {
+          Description: string | null
+          Group: string | null
+          id: number
+          "Link to Material": string | null
+          Manufacturer: string | null
+          Model: string | null
+          Name: string | null
+          RetailPrice: number | null
+          SKU: string | null
+          Supplier: string | null
+          "Unit Of Measurement (if applicable)": string | null
+        }
+        Insert: {
+          Description?: string | null
+          Group?: string | null
+          id: number
+          "Link to Material"?: string | null
+          Manufacturer?: string | null
+          Model?: string | null
+          Name?: string | null
+          RetailPrice?: number | null
+          SKU?: string | null
+          Supplier?: string | null
+          "Unit Of Measurement (if applicable)"?: string | null
+        }
+        Update: {
+          Description?: string | null
+          Group?: string | null
+          id?: number
+          "Link to Material"?: string | null
+          Manufacturer?: string | null
+          Model?: string | null
+          Name?: string | null
+          RetailPrice?: number | null
+          SKU?: string | null
+          Supplier?: string | null
+          "Unit Of Measurement (if applicable)"?: string | null
         }
         Relationships: []
       }
@@ -325,6 +417,57 @@ export type Database = {
             columns: ["user"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: number
+          ItemId: number
+          Notes: string | null
+          OrderId: number
+          Price: number | null
+          Qty: number
+          Room: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: number
+          ItemId: number
+          Notes?: string | null
+          OrderId: number
+          Price?: number | null
+          Qty: number
+          Room?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: number
+          ItemId?: number
+          Notes?: string | null
+          OrderId?: number
+          Price?: number | null
+          Qty?: number
+          Room?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_itemorders_ItemId_fkey"
+            columns: ["ItemId"]
+            isOneToOne: false
+            referencedRelation: "lineitems"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_itemorders_OrderId_fkey"
+            columns: ["OrderId"]
+            isOneToOne: false
+            referencedRelation: "orders"
             referencedColumns: ["id"]
           },
         ]
@@ -702,6 +845,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      WorkType: {
+        Row: {
+          created_at: string
+          id: number
+          type: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          type?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          type?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {

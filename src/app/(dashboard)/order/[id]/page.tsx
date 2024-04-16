@@ -22,7 +22,10 @@ import Warranties from "./components/warranties";
 import Settings from "./components/settings";
 import History from "./components/history";
 import { compareArrays } from "@/utils/commonUtils";
-type Product = Database["public"]["Tables"]["products"]["Row"];
+type Item = Database["public"]["Tables"]["lineitems"]["Row"];
+type Product = Database["public"]["Tables"]["order_items"]["Row"] & {
+  ItemId: Item;
+};
 type Order = Database["public"]["Tables"]["orders"]["Row"];
 interface COProduct extends Product {
   status: string;
@@ -71,7 +74,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
   async function getProducts() {
     setProductsLoading(true);
-    let { data: products, error } = await supabase.from("products").select("*").eq("orderId", params.id);
+    let { data: products, error } = await supabase.from("order_items").select("*, ItemId!inner(*)").eq("OrderId", params.id).returns<Product[]>();
     if (products) {
       setProducts(products);
       coProducts.current = products;
@@ -164,7 +167,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
   if (order && user)
     return (
-      <section className="p-5">
+      <section className="p-5 w-full">
         <ul className="hidden text-sm font-medium text-center text-gray-500 divide-x divide-gray-200 rounded-lg shadow sm:flex dark:divide-gray-700 dark:text-gray-400">
           <li className="w-full cursor-pointer">
             <div
@@ -260,10 +263,12 @@ export default function Page({ params }: { params: { id: string } }) {
                     {order.access_instructions}
                   </p>
                   <p className="mb-2 text-sm text-gray-900 dark:text-white">
-                    <strong>Allocated Amount: </strong>${calculateTotalPrice(products, "retail_price")}
+                    <strong>Allocated Amount: </strong>
+                    {calculateTotalPrice(products, "retail_price")}
                   </p>
                   <p className="mb-2 text-sm text-gray-900 dark:text-white">
-                    <strong>Aquired Amount: </strong>${calculateTotalPrice(products, "price")}
+                    <strong>Aquired Amount: </strong>
+                    {calculateTotalPrice(products, "price")}
                   </p>
                 </Accordion.Content>
               </Accordion.Panel>

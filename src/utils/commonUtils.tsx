@@ -1,5 +1,8 @@
 import { Database } from "../../types/supabase";
-type Product = Database["public"]["Tables"]["products"]["Row"];
+type Item = Database["public"]["Tables"]["lineitems"]["Row"];
+type Product = Database["public"]["Tables"]["order_items"]["Row"] & {
+  ItemId: Item;
+};
 interface COProduct extends Product {
   status: string;
 }
@@ -87,29 +90,68 @@ export function numberWithCommas(x: number) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+// export function calculateTotalPrice(products: Product[], property: "retail_price" | "price") {
+//   let totalCost = 0;
+
+//   // Iterate through the array
+//   for (let i = 0; i < products.length; i++) {
+//     // Multiply quantity by price for each item and add to totalCost
+//     totalCost += products[i].Qty * products[i][property]!;
+//   }
+
+//   return totalCost;
+// }
+
 export function calculateTotalPrice(products: Product[], property: "retail_price" | "price") {
   let totalCost = 0;
 
   // Iterate through the array
   for (let i = 0; i < products.length; i++) {
     // Multiply quantity by price for each item and add to totalCost
-    totalCost += products[i].quantity * products[i][property]!;
+    totalCost += products[i].Qty * products[i]["Price"]!;
   }
 
-  return totalCost;
+  return formatToUSD(totalCost);
 }
+
+// export function compareArrays(previousProducts: Product[], currentProducts: Product[]) {
+//   const newArray: COProduct[] = [];
+
+//   // Find new items
+//   currentProducts.forEach((item2) => {
+//     if (!previousProducts.some((item1) => item1.description === item2.description)) {
+//       newArray.push({ ...item2, status: "new" });
+//       // Find items with updated price
+//     } else if (previousProducts.some((item1) => item1.description === item2.description && item2.price !== item1.price)) {
+//       newArray.push({ ...item2, status: "updated" });
+//     } else if (previousProducts.some((item1) => item1.description === item2.description && item2.quantity !== item1.quantity)) {
+//       newArray.push({ ...item2, status: "updated" });
+//     } else {
+//       newArray.push({ ...item2, status: "" });
+//     }
+//   });
+
+//   // Find removed items
+//   previousProducts.forEach((item1) => {
+//     if (!currentProducts.some((item2) => item2.description === item1.description)) {
+//       newArray.push({ ...item1, status: "removed" });
+//     }
+//   });
+
+//   return newArray;
+// }
 
 export function compareArrays(previousProducts: Product[], currentProducts: Product[]) {
   const newArray: COProduct[] = [];
 
   // Find new items
   currentProducts.forEach((item2) => {
-    if (!previousProducts.some((item1) => item1.description === item2.description)) {
+    if (!previousProducts.some((item1) => item1.ItemId.Description === item2.ItemId.Description)) {
       newArray.push({ ...item2, status: "new" });
       // Find items with updated price
-    } else if (previousProducts.some((item1) => item1.description === item2.description && item2.price !== item1.price)) {
+    } else if (previousProducts.some((item1) => item1.ItemId.Description === item2.ItemId.Description && item2.Price !== item1.Price)) {
       newArray.push({ ...item2, status: "updated" });
-    } else if (previousProducts.some((item1) => item1.description === item2.description && item2.quantity !== item1.quantity)) {
+    } else if (previousProducts.some((item1) => item1.ItemId.Description === item2.ItemId.Description && item2.Qty !== item1.Qty)) {
       newArray.push({ ...item2, status: "updated" });
     } else {
       newArray.push({ ...item2, status: "" });
@@ -118,7 +160,7 @@ export function compareArrays(previousProducts: Product[], currentProducts: Prod
 
   // Find removed items
   previousProducts.forEach((item1) => {
-    if (!currentProducts.some((item2) => item2.description === item1.description)) {
+    if (!currentProducts.some((item2) => item2.ItemId.Description === item1.ItemId.Description)) {
       newArray.push({ ...item1, status: "removed" });
     }
   });
