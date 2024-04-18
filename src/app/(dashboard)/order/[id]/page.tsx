@@ -21,7 +21,7 @@ import ActiveOrder from "./components/activeOrder";
 import Warranties from "./components/warranties";
 import Settings from "./components/settings";
 import History from "./components/history";
-import { compareArrays } from "@/utils/commonUtils";
+import { compareArrays, formatToUSD } from "@/utils/commonUtils";
 type Item = Database["public"]["Tables"]["line_items"]["Row"];
 type Product = Database["public"]["Tables"]["order_items"]["Row"] & {
   item_id: Item;
@@ -264,11 +264,11 @@ export default function Page({ params }: { params: { id: string } }) {
                   </p>
                   <p className="mb-2 text-sm text-gray-900 dark:text-white">
                     <strong>Allocated Amount: </strong>
-                    {calculateTotalPrice(products, "retail_price")}
+                    {formatToUSD(calculateTotalPrice(products, "retail_price"))}
                   </p>
                   <p className="mb-2 text-sm text-gray-900 dark:text-white">
                     <strong>Aquired Amount: </strong>
-                    {calculateTotalPrice(products, "price")}
+                    {formatToUSD(calculateTotalPrice(products, "price"))}
                   </p>
                 </Accordion.Content>
               </Accordion.Panel>
