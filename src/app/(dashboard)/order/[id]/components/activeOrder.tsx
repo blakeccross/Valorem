@@ -31,7 +31,7 @@ export default function ActiveOrder({
   const searchParams = useSearchParams();
   const { user, SignOut } = useContext(UserContext);
   const router = useRouter();
-  const productSortedByType: ProductArray[] = MergeProductsbyKey(products, "Room");
+  const productSortedByType: ProductArray[] = MergeProductsbyKey(products, "room");
 
   function handleRemoveProduct(product: Product) {
     let removedProduct = { ...product, status: "removed" };
@@ -43,7 +43,7 @@ export default function ActiveOrder({
       <div className="flex flex-col flex-1 gap-4">
         {productSortedByType.length >= 1 ? (
           productSortedByType
-            .sort((a, b) => (a[0].room || "").localeCompare(b[0].room || ""))
+            .sort((a, b) => (a[0].item_id.description || "").localeCompare(b[0].item_id.description || ""))
             .map((item: ProductArray) => (
               <Card key={item[0].id} className="overflow-x-auto">
                 <h5 className="mb-2 text-2xl text-center font-bold text-gray-900 dark:text-white">{item[0].room}</h5>
