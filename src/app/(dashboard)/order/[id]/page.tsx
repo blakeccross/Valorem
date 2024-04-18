@@ -244,7 +244,7 @@ export default function Page({ params }: { params: { id: string } }) {
             </div>
             <p className="mb-2 text-sm text-gray-900 dark:text-white">
               <b>Date Created: </b>
-              {moment(order.created_at).format("MMMM DD, YYYY HH:mm a")}
+              {moment(order.created_at).format("MMMM DD, YYYY hh:mm a")}
             </p>
             <p className="mb-2 text-sm text-gray-900 dark:text-white">
               <b>Address: </b>
