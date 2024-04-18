@@ -7,7 +7,7 @@ import { Database } from "../../../../types/supabase";
 import moment from "moment";
 import NewOrderModal from "./newOrder.modal";
 import Link from "next/link";
-import { MergeOrdersbyKey } from "@/utils/commonUtils";
+import { MergeOrdersbyKey, formatToUSD } from "@/utils/commonUtils";
 import { BiSolidPackage, BiDotsVerticalRounded } from "react-icons/bi";
 import DownloadPDF from "./downloadPDF";
 import { TfiAngleDown, TfiAngleUp } from "react-icons/tfi";
@@ -94,14 +94,14 @@ export default function ClientView() {
       return (
         <div className="flex-row flex">
           <BsArrowUpShort color="rgb(132 204 22 / var(--tw-text-opacity))" />
-          <span className="font-normal text-lime-500 text-sm">{status}</span>
+          <span className="font-normal text-lime-500 text-sm">{formatToUSD(status)}</span>
         </div>
       );
     } else if (status < 0) {
       return (
         <div className="flex-row flex">
           <BsArrowDownShort color="rgb(224 36 36 / var(--tw-text-opacity))" />
-          <span className="font-normal text-red-600 text-sm">{status}</span>
+          <span className="font-normal text-red-600 text-sm">{formatToUSD(status)}</span>
         </div>
       );
     } else return null;
