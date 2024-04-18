@@ -152,7 +152,7 @@ export default function Page({ params }: { params: { id: string } }) {
     let allProductsUpdatedId = allProducts
       .filter((item) => item.status !== "removed")
       .map((item) => {
-        const { status, id, ...updatedProduct } = item;
+        const { status, id, created_at, ...updatedProduct } = item;
         return { ...updatedProduct, order_id: orderId, item_id: item.item_id.id };
       });
 

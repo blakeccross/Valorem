@@ -37,12 +37,12 @@ export default function NewProductModal({
 
   function handleAddProduct() {
     let product = {
-      ItemId: { Description: description },
-      Qty: quantity,
-      Price: price || 0,
-      size: size,
-      Room: category || "",
-      orderId: orderId,
+      item_id: { description: description, id: orderId },
+      quantity: quantity,
+      price: price || 0,
+      // size: size,
+      room: category || "",
+      order_id: orderId,
       status: "new",
     };
     addProduct(product);
@@ -50,7 +50,7 @@ export default function NewProductModal({
   }
 
   async function searchCatalog() {
-    const { data, error } = await supabase.from("materials").select().textSearch("description", name);
+    const { data, error } = await supabase.from("materials").select().textSearch("name", name);
     if (data) {
       setCatalog(data);
     }
