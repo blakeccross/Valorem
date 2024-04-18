@@ -1,7 +1,7 @@
 import { Database } from "../../types/supabase";
-type Item = Database["public"]["Tables"]["lineitems"]["Row"];
+type Item = Database["public"]["Tables"]["line_items"]["Row"];
 type Product = Database["public"]["Tables"]["order_items"]["Row"] & {
-  ItemId: Item;
+  item_id: Item;
 };
 interface COProduct extends Product {
   status: string;
@@ -108,10 +108,9 @@ export function calculateTotalPrice(products: Product[], property: "retail_price
   // Iterate through the array
   for (let i = 0; i < products.length; i++) {
     // Multiply quantity by price for each item and add to totalCost
-    totalCost += products[i].Qty * products[i]["Price"]!;
+    totalCost += products[i].quantity * products[i]["price"]!;
   }
-
-  return formatToUSD(totalCost);
+  return totalCost;
 }
 
 // export function compareArrays(previousProducts: Product[], currentProducts: Product[]) {
@@ -146,12 +145,12 @@ export function compareArrays(previousProducts: Product[], currentProducts: Prod
 
   // Find new items
   currentProducts.forEach((item2) => {
-    if (!previousProducts.some((item1) => item1.ItemId.Description === item2.ItemId.Description)) {
+    if (!previousProducts.some((item1) => item1.item_id.description === item2.item_id.description)) {
       newArray.push({ ...item2, status: "new" });
       // Find items with updated price
-    } else if (previousProducts.some((item1) => item1.ItemId.Description === item2.ItemId.Description && item2.Price !== item1.Price)) {
+    } else if (previousProducts.some((item1) => item1.item_id.description === item2.item_id.description && item2.price !== item1.price)) {
       newArray.push({ ...item2, status: "updated" });
-    } else if (previousProducts.some((item1) => item1.ItemId.Description === item2.ItemId.Description && item2.Qty !== item1.Qty)) {
+    } else if (previousProducts.some((item1) => item1.item_id.description === item2.item_id.description && item2.quantity !== item1.quantity)) {
       newArray.push({ ...item2, status: "updated" });
     } else {
       newArray.push({ ...item2, status: "" });
@@ -160,7 +159,7 @@ export function compareArrays(previousProducts: Product[], currentProducts: Prod
 
   // Find removed items
   previousProducts.forEach((item1) => {
-    if (!currentProducts.some((item2) => item2.ItemId.Description === item1.ItemId.Description)) {
+    if (!currentProducts.some((item2) => item2.item_id.description === item1.item_id.description)) {
       newArray.push({ ...item1, status: "removed" });
     }
   });

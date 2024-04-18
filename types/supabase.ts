@@ -9,10 +9,8 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      catalog: {
+      catalog_OLD: {
         Row: {
-          " SKU ": number | null
-          " UOM ": string | null
           category: string | null
           client: string | null
           cost: number | null
@@ -20,10 +18,10 @@ export type Database = {
           id: string
           notes: string | null
           revenue: number | null
+          SKU: number | null
+          UOM: string | null
         }
         Insert: {
-          " SKU "?: number | null
-          " UOM "?: string | null
           category?: string | null
           client?: string | null
           cost?: number | null
@@ -31,10 +29,10 @@ export type Database = {
           id?: string
           notes?: string | null
           revenue?: number | null
+          SKU?: number | null
+          UOM?: string | null
         }
         Update: {
-          " SKU "?: number | null
-          " UOM "?: string | null
           category?: string | null
           client?: string | null
           cost?: number | null
@@ -42,6 +40,8 @@ export type Database = {
           id?: string
           notes?: string | null
           revenue?: number | null
+          SKU?: number | null
+          UOM?: string | null
         }
         Relationships: []
       }
@@ -227,50 +227,50 @@ export type Database = {
           },
         ]
       }
-      lineitems: {
+      line_items: {
         Row: {
-          CostCategory: string | null
-          CostCode: number | null
+          cost_category: string | null
+          cost_code: number | null
           created_at: string
-          Description: string | null
+          description: string | null
           id: number
-          LineItemName: string
-          LineItemNameClean: string
-          MaterialId: number | null
-          Notes: string | null
-          Options: string | null
-          UOM: string | null
+          material_Id: number | null
+          name: string
+          name_clean: string
+          notes: string | null
+          options: string | null
+          uom: string | null
         }
         Insert: {
-          CostCategory?: string | null
-          CostCode?: number | null
+          cost_category?: string | null
+          cost_code?: number | null
           created_at?: string
-          Description?: string | null
+          description?: string | null
           id?: number
-          LineItemName: string
-          LineItemNameClean: string
-          MaterialId?: number | null
-          Notes?: string | null
-          Options?: string | null
-          UOM?: string | null
+          material_Id?: number | null
+          name: string
+          name_clean: string
+          notes?: string | null
+          options?: string | null
+          uom?: string | null
         }
         Update: {
-          CostCategory?: string | null
-          CostCode?: number | null
+          cost_category?: string | null
+          cost_code?: number | null
           created_at?: string
-          Description?: string | null
+          description?: string | null
           id?: number
-          LineItemName?: string
-          LineItemNameClean?: string
-          MaterialId?: number | null
-          Notes?: string | null
-          Options?: string | null
-          UOM?: string | null
+          material_Id?: number | null
+          name?: string
+          name_clean?: string
+          notes?: string | null
+          options?: string | null
+          uom?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "public_lineitems_MaterialId_fkey"
-            columns: ["MaterialId"]
+            columns: ["material_Id"]
             isOneToOne: false
             referencedRelation: "materials"
             referencedColumns: ["id"]
@@ -300,43 +300,43 @@ export type Database = {
       }
       materials: {
         Row: {
-          Description: string | null
-          Group: string | null
+          description: string | null
+          group: string | null
           id: number
-          "Link to Material": string | null
-          Manufacturer: string | null
-          Model: string | null
-          Name: string | null
-          RetailPrice: number | null
-          SKU: string | null
-          Supplier: string | null
-          "Unit Of Measurement (if applicable)": string | null
+          link_to_material: string | null
+          manufacturer: string | null
+          model: string | null
+          name: string | null
+          retail_price: number | null
+          sku: string | null
+          supplier: string | null
+          unit_of_measurement: string | null
         }
         Insert: {
-          Description?: string | null
-          Group?: string | null
+          description?: string | null
+          group?: string | null
           id: number
-          "Link to Material"?: string | null
-          Manufacturer?: string | null
-          Model?: string | null
-          Name?: string | null
-          RetailPrice?: number | null
-          SKU?: string | null
-          Supplier?: string | null
-          "Unit Of Measurement (if applicable)"?: string | null
+          link_to_material?: string | null
+          manufacturer?: string | null
+          model?: string | null
+          name?: string | null
+          retail_price?: number | null
+          sku?: string | null
+          supplier?: string | null
+          unit_of_measurement?: string | null
         }
         Update: {
-          Description?: string | null
-          Group?: string | null
+          description?: string | null
+          group?: string | null
           id?: number
-          "Link to Material"?: string | null
-          Manufacturer?: string | null
-          Model?: string | null
-          Name?: string | null
-          RetailPrice?: number | null
-          SKU?: string | null
-          Supplier?: string | null
-          "Unit Of Measurement (if applicable)"?: string | null
+          link_to_material?: string | null
+          manufacturer?: string | null
+          model?: string | null
+          name?: string | null
+          retail_price?: number | null
+          sku?: string | null
+          supplier?: string | null
+          unit_of_measurement?: string | null
         }
         Relationships: []
       }
@@ -423,49 +423,46 @@ export type Database = {
       }
       order_items: {
         Row: {
-          category: string | null
           created_at: string
           id: number
-          ItemId: number
-          Notes: string | null
-          OrderId: number
-          Price: number | null
-          Qty: number
-          Room: string | null
+          item_id: number
+          notes: string | null
+          order_id: number
+          price: number | null
+          quantity: number
+          room: string | null
         }
         Insert: {
-          category?: string | null
           created_at?: string
           id?: number
-          ItemId: number
-          Notes?: string | null
-          OrderId: number
-          Price?: number | null
-          Qty: number
-          Room?: string | null
+          item_id: number
+          notes?: string | null
+          order_id: number
+          price?: number | null
+          quantity: number
+          room?: string | null
         }
         Update: {
-          category?: string | null
           created_at?: string
           id?: number
-          ItemId?: number
-          Notes?: string | null
-          OrderId?: number
-          Price?: number | null
-          Qty?: number
-          Room?: string | null
+          item_id?: number
+          notes?: string | null
+          order_id?: number
+          price?: number | null
+          quantity?: number
+          room?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "public_itemorders_ItemId_fkey"
-            columns: ["ItemId"]
+            columns: ["item_id"]
             isOneToOne: false
-            referencedRelation: "lineitems"
+            referencedRelation: "line_items"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "public_itemorders_OrderId_fkey"
-            columns: ["OrderId"]
+            columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
@@ -845,24 +842,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      WorkType: {
-        Row: {
-          created_at: string
-          id: number
-          type: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-          type?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: number
-          type?: string | null
-        }
-        Relationships: []
       }
     }
     Views: {

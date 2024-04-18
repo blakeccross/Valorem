@@ -5,7 +5,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../../../../../types/supabase";
 import moment from "moment";
 type Order = Database["public"]["Tables"]["orders"]["Row"];
-type Catalog = Database["public"]["Tables"]["catalog"]["Row"];
+type Catalog = Database["public"]["Tables"]["materials"]["Row"];
 type Product = Database["public"]["Tables"]["products"]["Row"];
 import { Button, Checkbox, Label, Modal, TextInput, Select, Textarea } from "flowbite-react";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -68,9 +68,9 @@ export default function NewProductModal({
 
   function handleSelectCatalogItem(value: Catalog) {
     setSelectedCatalog(value);
-    setCategory(value.category);
+    setCategory(value.group);
     setDescription(value.description || "");
-    setPrice(value.cost || 0);
+    setPrice(value.retail_price || 0);
     setQuantity(1);
   }
 

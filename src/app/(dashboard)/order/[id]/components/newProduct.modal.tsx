@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../../../../types/supabase";
 type Order = Database["public"]["Tables"]["orders"]["Row"];
-type Catalog = Database["public"]["Tables"]["catalog"]["Row"];
+type Catalog = Database["public"]["Tables"]["materials"]["Row"];
 type Product = Database["public"]["Tables"]["products"]["Row"];
 import { Button, Checkbox, Label, Modal, TextInput, Select, Textarea } from "flowbite-react";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -50,7 +50,7 @@ export default function NewProductModal({
   }
 
   async function searchCatalog() {
-    const { data, error } = await supabase.from("catalog").select().textSearch("description", name);
+    const { data, error } = await supabase.from("materials").select().textSearch("description", name);
     if (data) {
       setCatalog(data);
     }
@@ -58,9 +58,9 @@ export default function NewProductModal({
 
   function handleSelectCatalogItem(value: Catalog) {
     setSelectedCatalog(value);
-    setCategory(value.category);
+    // setCategory(value.category);
     setDescription(value.description || "");
-    setPrice(value.cost || 0);
+    setPrice(value.retail_price || 0);
     setQuantity(1);
   }
 

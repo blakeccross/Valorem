@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../../../types/supabase";
 type Order = Database["public"]["Tables"]["orders"]["Row"];
-type Catalog = Database["public"]["Tables"]["catalog"]["Row"];
+type Catalog = Database["public"]["Tables"]["materials"]["Row"];
 import { Button, Checkbox, Label, Modal, TextInput, Select, Textarea } from "flowbite-react";
 
 export default function MissingProductModal({
@@ -57,9 +57,9 @@ export default function MissingProductModal({
 
   function handleSelectCatalogItem(value: Catalog) {
     setSelectedCatalog(value);
-    setCategory(value.category);
+    setCategory(value.group);
     setDescription(value.description || "");
-    setPrice(value.cost || 0);
+    setPrice(value.retail_price || 0);
     setQuantity(1);
   }
 

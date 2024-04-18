@@ -22,9 +22,9 @@ import Warranties from "./components/warranties";
 import Settings from "./components/settings";
 import History from "./components/history";
 import { compareArrays } from "@/utils/commonUtils";
-type Item = Database["public"]["Tables"]["lineitems"]["Row"];
+type Item = Database["public"]["Tables"]["line_items"]["Row"];
 type Product = Database["public"]["Tables"]["order_items"]["Row"] & {
-  ItemId: Item;
+  item_id: Item;
 };
 type Order = Database["public"]["Tables"]["orders"]["Row"];
 interface COProduct extends Product {
@@ -74,7 +74,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
   async function getProducts() {
     setProductsLoading(true);
-    let { data: products, error } = await supabase.from("order_items").select("*, ItemId!inner(*)").eq("OrderId", params.id).returns<Product[]>();
+    let { data: products, error } = await supabase.from("order_items").select("*, item_id!inner(*)").eq("order_id", params.id).returns<Product[]>();
     if (products) {
       setProducts(products);
       coProducts.current = products;
@@ -99,7 +99,7 @@ export default function Page({ params }: { params: { id: string } }) {
   }
 
   async function getPreviousProducts(id: number) {
-    let { data: products, error } = await supabase.from("products").select("*").eq("orderId", id);
+    let { data: products, error } = await supabase.from("order_items").select("*, item_id!inner(*)").eq("order_id", id);
     if (products) {
       previousProducts.current = products;
       getChangeOrder();
@@ -153,10 +153,10 @@ export default function Page({ params }: { params: { id: string } }) {
       .filter((item) => item.status !== "removed")
       .map((item) => {
         const { status, id, ...updatedProduct } = item;
-        return { ...updatedProduct, orderId: orderId };
+        return { ...updatedProduct, order_id: orderId, item_id: item.item_id.id };
       });
 
-    const { data, error } = await supabase.from("products").insert(allProductsUpdatedId).select();
+    const { data, error } = await supabase.from("order_items").insert(allProductsUpdatedId).select();
     if (error) {
       alert(error.message);
     }

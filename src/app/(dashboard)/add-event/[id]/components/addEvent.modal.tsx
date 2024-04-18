@@ -5,7 +5,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../../../../types/supabase";
 import { useRouter } from "next/navigation";
 type Order = Database["public"]["Tables"]["orders"]["Row"];
-type Catalog = Database["public"]["Tables"]["catalog"]["Row"];
+type Catalog = Database["public"]["Tables"]["materials"]["Row"];
 type Product = Database["public"]["Tables"]["products"]["Row"];
 import { Button, Datepicker, Label, Modal, TextInput, Select, Textarea } from "flowbite-react";
 import { UserContext } from "@/context/userContext";

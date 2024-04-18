@@ -11,9 +11,9 @@ import dynamic from "next/dynamic";
 import { UserContext } from "@/context/userContext";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 type Warranty = Database["public"]["Tables"]["warranties"]["Row"];
-type Item = Database["public"]["Tables"]["lineitems"]["Row"];
+type Item = Database["public"]["Tables"]["line_items"]["Row"];
 type Product = Database["public"]["Tables"]["order_items"]["Row"] & {
-  ItemId: Item;
+  item_id: Item;
 };
 type ProductArray = [Product];
 

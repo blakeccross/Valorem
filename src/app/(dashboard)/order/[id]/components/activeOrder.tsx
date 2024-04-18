@@ -6,9 +6,9 @@ import { numberWithCommas } from "@/utils/commonUtils";
 import { UserContext } from "@/context/userContext";
 import { useRouter } from "next/navigation";
 import { MergeProductsbyKey } from "@/utils/commonUtils";
-type Item = Database["public"]["Tables"]["lineitems"]["Row"];
+type Item = Database["public"]["Tables"]["line_items"]["Row"];
 type Product = Database["public"]["Tables"]["order_items"]["Row"] & {
-  ItemId: Item;
+  item_id: Item;
 };
 type Order = Database["public"]["Tables"]["orders"]["Row"];
 type ProductArray = [COProduct];
@@ -43,10 +43,10 @@ export default function ActiveOrder({
       <div className="flex flex-col flex-1 gap-4">
         {productSortedByType.length >= 1 ? (
           productSortedByType
-            .sort((a, b) => (a[0].Room || "").localeCompare(b[0].Room || ""))
+            .sort((a, b) => (a[0].room || "").localeCompare(b[0].room || ""))
             .map((item: ProductArray) => (
               <Card key={item[0].id} className="overflow-x-auto">
-                <h5 className="mb-2 text-2xl text-center font-bold text-gray-900 dark:text-white">{item[0].Room}</h5>
+                <h5 className="mb-2 text-2xl text-center font-bold text-gray-900 dark:text-white">{item[0].room}</h5>
                 <Table>
                   <Table.Head>
                     <Table.HeadCell>Product Description</Table.HeadCell>
@@ -56,7 +56,7 @@ export default function ActiveOrder({
                     {isEditing && <Table.HeadCell></Table.HeadCell>}
                   </Table.Head>
                   {item
-                    .sort((a, b) => (a.ItemId.Description || "z").localeCompare(b.ItemId.Description || "z"))
+                    .sort((a, b) => (a.item_id.description || "z").localeCompare(b.item_id.description || "z"))
                     .map((product, index) => (
                       <Table.Body className="divide-y" key={product.id}>
                         <Table.Row
@@ -68,12 +68,12 @@ export default function ActiveOrder({
                           }
                         >
                           <Table.Cell className="font-medium text-gray-900 dark:text-white">
-                            <p>{product.ItemId.Description}</p>
+                            <p>{product.item_id.description}</p>
                           </Table.Cell>
-                          <Table.Cell>{product.Qty}</Table.Cell>
-                          <Table.Cell className="whitespace-nowrap">{"$" + numberWithCommas(Math.floor(product.Price || 0))}</Table.Cell>
+                          <Table.Cell>{product.quantity}</Table.Cell>
+                          <Table.Cell className="whitespace-nowrap">{"$" + numberWithCommas(Math.floor(product.price || 0))}</Table.Cell>
                           <Table.Cell className="whitespace-nowrap">
-                            {"$" + numberWithCommas(Math.floor(product.Price || 0 * product.Qty))}
+                            {"$" + numberWithCommas(Math.floor(product.price || 0 * product.quantity))}
                           </Table.Cell>
                           {isEditing && (
                             <Table.Cell>
