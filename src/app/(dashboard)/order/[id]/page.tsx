@@ -114,7 +114,7 @@ export default function Page({ params }: { params: { id: string } }) {
     let currentProducts = coProducts.current;
 
     let resultArray = compareArrays(previousProducts.current, currentProducts);
-    console.log("RESULTS", resultArray, "PREV", previousProducts.current, "CURRENT", currentProducts);
+    // console.log("RESULTS", resultArray, "PREV", previousProducts.current, "CURRENT", currentProducts);
     setProducts(resultArray);
   }
 

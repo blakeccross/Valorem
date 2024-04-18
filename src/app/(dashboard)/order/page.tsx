@@ -78,9 +78,9 @@ export default function ClientView() {
   async function getProducts() {
     const orderIds = orders.flatMap((innerArray) => innerArray.map((item) => item.id)).join(",");
     let { data, count } = await supabase
-      .from("products")
+      .from("order_items")
       .select("*")
-      .filter("orderId", "in", "(" + orderIds + ")")
+      .filter("order_id", "in", "(" + orderIds + ")")
       .order("created_at");
     if (data) {
       setProducts(data);
@@ -291,7 +291,7 @@ export default function ClientView() {
                                     <p className="text-sm">
                                       {"Items: "}
                                       {products.reduce((count, product) => {
-                                        if (product.orderId === co.id) {
+                                        if (product.order_id === co.id) {
                                           return count + 1;
                                         }
                                         return count;

@@ -8,7 +8,10 @@ import { Database } from "../../../../types/supabase";
 import { MergeProductsbyKey } from "@/utils/commonUtils";
 import moment from "moment";
 import { numberWithCommas } from "@/utils/commonUtils";
-type Product = Database["public"]["Tables"]["products"]["Row"];
+type Item = Database["public"]["Tables"]["line_items"]["Row"];
+type Product = Database["public"]["Tables"]["order_items"]["Row"] & {
+  item_id: Item;
+};
 type Order = Database["public"]["Tables"]["orders"]["Row"];
 type ProductArray = [Product];
 
@@ -23,10 +26,10 @@ export default function DownloadPDF({ orderId, id }: { orderId: number; id: numb
           {products.map((item: ProductArray) =>
             item.map((product) => (
               <View key={item[0].id} style={styles.card}>
-                <Text style={styles.header}>{item[0].type}</Text>
+                <Text style={styles.header}>{item[0].room}</Text>
                 <View style={styles.section} key={product.id}>
-                  <Text>{product.type}</Text>
-                  <Text>{product.description}</Text>
+                  <Text>{product.room}</Text>
+                  <Text>{product.item_id.description}</Text>
                   <Text>{product.quantity}</Text>
                   <Text>{product.price}</Text>
                 </View>
@@ -56,10 +59,9 @@ export default function DownloadPDF({ orderId, id }: { orderId: number; id: numb
   }
 
   async function getProducts() {
-    let { data: products, error } = await supabase.from("products").select("*").eq("orderId", id);
+    let { data: products, error } = await supabase.from("order_items").select("*, item_id!inner(*)").eq("order_id", id);
     if (products) {
-      console.log("PROD", products);
-      return MergeProductsbyKey(products, "type");
+      return MergeProductsbyKey(products, "room");
     }
   }
 
@@ -76,20 +78,20 @@ const styles = StyleSheet.create({
   page: {
     // flexDirection: "column",
     backgroundColor: "#E4E4E4",
+    fontSize: 14,
     // margin: 20,
   },
   // max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700
   card: {
-    padding: 24,
+    // padding: 24,
     backgroundColor: "white",
-    borderWidth: 1,
+    borderBottomWidth: 1,
     borderColor: "rgb(229 231 235)",
-    borderRadius: 8,
-    boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
   },
   header: {
     // marginBottom: 8,
-    fontSize: 24,
+    fontSize: 16,
+    fontWeight: "bold",
     // lineHeight: 32,
     // fontWeight: "semibold",
     // textAlign: "center",
