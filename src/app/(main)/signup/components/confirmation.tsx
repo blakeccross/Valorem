@@ -39,12 +39,14 @@ export default function Confirmation() {
     });
     if (error) alert(error.message);
     if (user) {
-      // await setUserType(user.id);
       if (formData.accountType === "client") {
         let organization = await handleCreateOrgination();
         if (organization) {
           await handleAddUserToOrg(user.id, organization.id);
         }
+      } else {
+        // Not a client
+        onHandleNext();
       }
     }
   };
