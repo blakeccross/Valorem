@@ -4,7 +4,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../../../../../types/supabase";
 import { UserContext } from "@/context/userContext";
 import { useRouter } from "next/navigation";
-import { MergeProductsbyKey, numberWithCommas } from "@/utils/commonUtils";
+import { MergeProductsbyKey, numberWithCommas, sortOrderTable } from "@/utils/commonUtils";
 type Item = Database["public"]["Tables"]["line_items"]["Row"];
 type Product = Database["public"]["Tables"]["order_items"]["Row"] & {
   item_id: Item;
@@ -22,11 +22,12 @@ export default function ChangeOrder({ products }: { products: Product[] }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const productSortedByType = MergeProductsbyKey(products, "room");
+  console.log("BOn");
 
   return (
     <section>
       <div className="flex flex-col gap-4">
-        {productSortedByType.map((item: any) => (
+        {productSortedByType.sort(sortOrderTable).map((item: any) => (
           <Card key={item[0].id} className="overflow-x-auto">
             <h5 className="mb-2 text-2xl text-center font-bold text-gray-900 dark:text-white">{item[0].type}</h5>
             <Table>

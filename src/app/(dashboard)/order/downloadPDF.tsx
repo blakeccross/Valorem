@@ -59,7 +59,7 @@ export default function DownloadPDF({ orderId, id }: { orderId: number; id: numb
   }
 
   async function getProducts() {
-    let { data: products, error } = await supabase.from("order_items").select("*, item_id!inner(*)").eq("order_id", id);
+    let { data: products, error } = await supabase.from("order_items").select("*, item_id!inner(*)").eq("order_id", id).returns<Product[]>();
     if (products) {
       return MergeProductsbyKey(products, "room");
     }

@@ -2,7 +2,7 @@ import { Card, Toast, Table } from "flowbite-react";
 import { useState, useRef, useContext } from "react";
 import { MdDeleteOutline } from "react-icons/md";
 import { Database } from "../../../../../../../types/supabase";
-import { numberWithCommas } from "@/utils/commonUtils";
+import { numberWithCommas, sortOrderTable } from "@/utils/commonUtils";
 import { UserContext } from "@/context/userContext";
 import { useRouter } from "next/navigation";
 import { MergeProductsbyKey } from "@/utils/commonUtils";
@@ -23,50 +23,48 @@ export default function ActiveOrder({ products }: { products: Product[] }) {
   const searchParams = useSearchParams();
   const { user, SignOut } = useContext(UserContext);
   const router = useRouter();
-  const productSortedByType: ProductArray[] = MergeProductsbyKey(products, "room");
+  const productSortedByType = MergeProductsbyKey(products, "room");
 
   return (
     <div>
       <div className="flex flex-col flex-1 gap-4">
         {productSortedByType.length >= 1 ? (
-          productSortedByType
-            .sort((a, b) => (a[0].item_id.description || "").localeCompare(b[0].item_id.description || ""))
-            .map((item: ProductArray) => (
-              <Card key={item[0].id} className="overflow-x-auto">
-                <h5 className="mb-2 text-2xl text-center font-bold text-gray-900 dark:text-white">{item[0].room}</h5>
-                <Table>
-                  <Table.Head>
-                    <Table.HeadCell>Product Description</Table.HeadCell>
-                    <Table.HeadCell>Qty</Table.HeadCell>
-                    <Table.HeadCell>Price</Table.HeadCell>
-                    <Table.HeadCell>Total Price</Table.HeadCell>
-                  </Table.Head>
-                  {item
-                    .sort((a, b) => (a.item_id.description || "z").localeCompare(b.item_id.description || "z"))
-                    .map((product, index) => (
-                      <Table.Body className="divide-y" key={product.id}>
-                        <Table.Row
-                          className={
-                            `dark:border-gray-700 dark:bg-gray-800 ` +
-                            ((product.status === "updated" && ` bg-amber-200 dark:bg-amber-800`) ||
-                              (product.status === "removed" && ` bg-red-200 dark:bg-red-800`) ||
-                              (product.status === "new" && ` bg-green-200 dark:bg-green-800`))
-                          }
-                        >
-                          <Table.Cell className="font-medium text-gray-900 dark:text-white">
-                            <p>{product.item_id.description}</p>
-                          </Table.Cell>
-                          <Table.Cell>{product.quantity}</Table.Cell>
-                          <Table.Cell className="whitespace-nowrap">{"$" + numberWithCommas(Math.floor(product.price || 0))}</Table.Cell>
-                          <Table.Cell className="whitespace-nowrap">
-                            {"$" + numberWithCommas(Math.floor(product.price || 0 * product.quantity))}
-                          </Table.Cell>
-                        </Table.Row>
-                      </Table.Body>
-                    ))}
-                </Table>
-              </Card>
-            ))
+          productSortedByType.sort(sortOrderTable).map((item) => (
+            <Card key={item[0].id} className="overflow-x-auto">
+              <h5 className="mb-2 text-2xl text-center font-bold text-gray-900 dark:text-white">{item[0].room}</h5>
+              <Table>
+                <Table.Head>
+                  <Table.HeadCell>Product Description</Table.HeadCell>
+                  <Table.HeadCell>Qty</Table.HeadCell>
+                  <Table.HeadCell>Price</Table.HeadCell>
+                  <Table.HeadCell>Total Price</Table.HeadCell>
+                </Table.Head>
+                {item
+                  .sort((a, b) => (a.item_id.description || "z").localeCompare(b.item_id.description || "z"))
+                  .map((product, index) => (
+                    <Table.Body className="divide-y" key={product.id}>
+                      <Table.Row
+                        className={
+                          `dark:border-gray-700 dark:bg-gray-800 ` +
+                          ((product.status === "updated" && ` bg-amber-200 dark:bg-amber-800`) ||
+                            (product.status === "removed" && ` bg-red-200 dark:bg-red-800`) ||
+                            (product.status === "new" && ` bg-green-200 dark:bg-green-800`))
+                        }
+                      >
+                        <Table.Cell className="font-medium text-gray-900 dark:text-white">
+                          <p>{product.item_id.description}</p>
+                        </Table.Cell>
+                        <Table.Cell>{product.quantity}</Table.Cell>
+                        <Table.Cell className="whitespace-nowrap">{"$" + numberWithCommas(Math.floor(product.price || 0))}</Table.Cell>
+                        <Table.Cell className="whitespace-nowrap">
+                          {"$" + numberWithCommas(Math.floor(product.price || 0 * product.quantity))}
+                        </Table.Cell>
+                      </Table.Row>
+                    </Table.Body>
+                  ))}
+              </Table>
+            </Card>
+          ))
         ) : (
           <div className="mx-auto my-24">
             <h5 className="mb-2 text-2xl font-bold text-gray-600 dark:text-white">No products added</h5>

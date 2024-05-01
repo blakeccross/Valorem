@@ -2,6 +2,7 @@ import { Database } from "../../types/supabase";
 type Item = Database["public"]["Tables"]["line_items"]["Row"];
 type Product = Database["public"]["Tables"]["order_items"]["Row"] & {
   item_id: Item;
+  status?: string;
 };
 interface COProduct extends Product {
   status: string;
@@ -9,8 +10,8 @@ interface COProduct extends Product {
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-export function MergeProductsbyKey(array: any, key: string) {
-  const arrays: any = [];
+export function MergeProductsbyKey(array: Product[], key: keyof Product) {
+  const arrays: Array<Product[]> = [];
 
   array.forEach((obj: any) => {
     let added = false;
@@ -145,12 +146,11 @@ export function compareArrays(previousProducts: Product[], currentProducts: Prod
 
   // Find new items
   currentProducts.forEach((item2) => {
-    if (!previousProducts.some((item1) => item1.item_id.description === item2.item_id.description)) {
+    const matchingItem = previousProducts.find((item1) => item1.item_id.id === item2.item_id.id && item1.room === item2.room);
+    if (!matchingItem) {
       newArray.push({ ...item2, status: "new" });
       // Find items with updated price
-    } else if (previousProducts.some((item1) => item1.item_id.description === item2.item_id.description && item2.price !== item1.price)) {
-      newArray.push({ ...item2, status: "updated" });
-    } else if (previousProducts.some((item1) => item1.item_id.description === item2.item_id.description && item2.quantity !== item1.quantity)) {
+    } else if (matchingItem.price !== item2.price || matchingItem.quantity !== item2.quantity) {
       newArray.push({ ...item2, status: "updated" });
     } else {
       newArray.push({ ...item2, status: "" });
@@ -159,7 +159,8 @@ export function compareArrays(previousProducts: Product[], currentProducts: Prod
 
   // Find removed items
   previousProducts.forEach((item1) => {
-    if (!currentProducts.some((item2) => item2.item_id.description === item1.item_id.description)) {
+    const matchingItem = currentProducts.find((item2) => item1.item_id.id === item2.item_id.id && item1.room === item2.room);
+    if (!matchingItem) {
       newArray.push({ ...item1, status: "removed" });
     }
   });
@@ -181,4 +182,8 @@ export function formatNumber(value: number): string {
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+export function sortOrderTable(a: Product[], b: Product[]) {
+  return (a[0].room || "").localeCompare(b[0].room || "");
 }

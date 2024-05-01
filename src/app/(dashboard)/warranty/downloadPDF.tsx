@@ -7,7 +7,10 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../../types/supabase";
 import { MergeProductsbyKey } from "@/utils/commonUtils";
 import moment from "moment";
-type Product = Database["public"]["Tables"]["products"]["Row"];
+type Item = Database["public"]["Tables"]["line_items"]["Row"];
+type Product = Database["public"]["Tables"]["order_items"]["Row"] & {
+  item_id: Item;
+};
 type Order = Database["public"]["Tables"]["orders"]["Row"];
 type ProductArray = [Product];
 
@@ -22,8 +25,8 @@ export default function DownloadPDF({ orderId, id }: { orderId: number; id: numb
           {products.map((pr: ProductArray) =>
             pr.map((item) => (
               <View style={styles.section} key={item.id}>
-                <Text>{item.type}</Text>
-                <Text>{item.description}</Text>
+                <Text>{item.room}</Text>
+                <Text>{item.item_id.description}</Text>
                 <Text>{item.quantity}</Text>
                 <Text>{item.price}</Text>
               </View>
@@ -52,9 +55,9 @@ export default function DownloadPDF({ orderId, id }: { orderId: number; id: numb
   }
 
   async function getProducts() {
-    let { data: products, error } = await supabase.from("products").select("*").eq("orderId", id);
+    let { data: products, error } = await supabase.from("order_items").select("*").eq("order_id", id).returns<Product[]>();
     if (products) {
-      return MergeProductsbyKey(products, "type");
+      return MergeProductsbyKey(products, "room");
     }
   }
 

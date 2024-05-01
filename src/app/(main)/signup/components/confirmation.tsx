@@ -29,7 +29,7 @@ export default function Confirmation() {
       email: formData.email,
       password: formData.password,
       options: {
-        emailRedirectTo: `${location.origin}/auth/callback`,
+        emailRedirectTo: `${location.origin}/auth/callback?next=dashboard`,
         data: {
           first_name: formData.firstName,
           last_name: formData.lastName,

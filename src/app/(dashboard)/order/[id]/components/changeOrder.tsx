@@ -4,10 +4,13 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "../../../../../../types/supabase";
 import { UserContext } from "@/context/userContext";
 import { useRouter } from "next/navigation";
-import { MergeProductsbyKey, numberWithCommas } from "@/utils/commonUtils";
-type Product = Database["public"]["Tables"]["products"]["Row"];
+import { MergeProductsbyKey, numberWithCommas, sortOrderTable } from "@/utils/commonUtils";
+type Item = Database["public"]["Tables"]["line_items"]["Row"];
+type Product = Database["public"]["Tables"]["order_items"]["Row"] & {
+  item_id: Item;
+};
 type Order = Database["public"]["Tables"]["orders"]["Row"];
-type ProductArray = [Product];
+type ProductArray = [COProduct];
 interface COProduct extends Product {
   status: string;
 }
@@ -18,12 +21,12 @@ export default function ChangeOrder({ products }: { products: Product[] }) {
   const coProducts = useRef<any[]>([]);
   const searchParams = useSearchParams();
   const router = useRouter();
-  const productSortedByType = MergeProductsbyKey(products, "type");
+  const productSortedByType = MergeProductsbyKey(products, "room");
 
   return (
     <section>
       <div className="flex flex-col gap-4">
-        {productSortedByType.map((item: any) => (
+        {productSortedByType.sort(sortOrderTable).map((item: any) => (
           <Card key={item[0].id} className="overflow-x-auto">
             <h5 className="mb-2 text-2xl text-center font-bold text-gray-900 dark:text-white">{item[0].type}</h5>
             <Table>
@@ -40,13 +43,13 @@ export default function ChangeOrder({ products }: { products: Product[] }) {
                       `dark:border-gray-700 dark:bg-gray-800 ` +
                       ((product.status === "updated" && ` bg-amber-200 dark:bg-amber-800`) ||
                         (product.status === "removed" && ` bg-red-200 dark:bg-red-800`) ||
-                        (product.status === "new" && ` bg-green-200 dark:bg-green-800`))
+                        (product.status === "new" && ` bg-lime-200 dark:bg-lime-800`))
                     }
                   >
-                    <Table.Cell className="font-medium text-gray-900 dark:text-white max-w-xs">{product.description}</Table.Cell>
+                    <Table.Cell className="font-medium text-gray-900 dark:text-white max-w-xs">{product.item_id.description}</Table.Cell>
                     <Table.Cell>{product.quantity}</Table.Cell>
-                    <Table.Cell className="whitespace-nowrap">{"$" + numberWithCommas(Math.floor(product.price))}</Table.Cell>
-                    <Table.Cell className="whitespace-nowrap">{"$" + numberWithCommas(Math.floor(product.price * product.quantity))}</Table.Cell>
+                    <Table.Cell className="whitespace-nowrap">{"$" + numberWithCommas(Math.floor(product.price || 0))}</Table.Cell>
+                    <Table.Cell className="whitespace-nowrap">{"$" + numberWithCommas(Math.floor(product.price || 0 * product.quantity))}</Table.Cell>
                   </Table.Row>
                 </Table.Body>
               ))}
