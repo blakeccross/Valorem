@@ -21,7 +21,7 @@ export default function Settings({ order }: { order: Order }) {
   const [accessInstructions, setAccessInstructions] = useState<string>("");
   const { user, organization } = useContext(UserContext);
   const router = useRouter();
-  const currentOrganization = user?.user_organizations?.find((org) => organization.id === org.organization);
+  const currentOrganization = user?.user_organizations?.find((org) => organization?.id === org.organization);
 
   useEffect(() => {
     if (order) {

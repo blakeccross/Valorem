@@ -46,7 +46,7 @@ export default function AddUserModal({ reloadTable }: { reloadTable: () => Promi
       let resendResponse = await response.json();
       await supabase
         .from("user_organizations")
-        .insert([{ user: resendResponse.id, organization: organization.id, type: type, role: type === "client" ? role : "viewer" }])
+        .insert([{ user: resendResponse.id, organization: organization?.id, type: type, role: type === "client" ? role : "viewer" }])
         .select();
       await reloadTable();
       setShowModal(false);
