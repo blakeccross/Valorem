@@ -38,7 +38,7 @@ export default function ClientView() {
   const router = useRouter();
   const { user, organization, allOrganizations } = useContext(UserContext);
   const [selectedOrginization, setSelectedOrginization] = useState<string>("");
-  const currentOrganization = user?.user_organizations?.find((org) => organization.id === org.organization);
+  const currentOrganization = user?.user_organizations?.find((org) => organization?.id === org.organization);
 
   // useEffect(() => {
   //   if (allOrganizations.length > 0) {
@@ -50,7 +50,7 @@ export default function ClientView() {
     if (organization) {
       getOrders();
     }
-  }, [sortBy, searchInput, organization.id]);
+  }, [sortBy, searchInput, organization?.id]);
 
   useEffect(() => {
     if (orders.length !== 0) {
@@ -62,7 +62,7 @@ export default function ClientView() {
     setTableIsLoading(true);
     let searchOrders = supabase.from("orders").select("*").order(sortBy, { ascending: true });
     if (searchInput) searchOrders.textSearch("project_name", searchInput);
-    searchOrders.eq("organization", organization.id);
+    searchOrders.eq("organization", organization?.id || 0);
 
     await searchOrders.then(({ data: orders, error }) => {
       if (error) {

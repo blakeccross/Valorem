@@ -11,7 +11,7 @@ type User_Organizations = Database["public"]["Tables"]["user_organizations"]["Ro
 type Orginization = Database["public"]["Tables"]["organizations"]["Row"];
 type UserContext = {
   user: User | undefined;
-  organization: Orginization;
+  organization: Orginization | undefined;
   setOrganization: (value: Orginization) => void;
   allOrganizations: Orginization[];
   SignOut: () => Promise<void>;
@@ -24,7 +24,7 @@ export default function UserProvider({ children }: { children: JSX.Element[] }) 
   // const [user, setUser] = useState<User>();
   const [user, setUser] = useLocalStorage("currentUser", {} as User);
   // const [organization, setOrganization] = useLocalStorage("currentUserOrganizations", {} as Orginization);
-  const [organization, setOrganization] = useState<Orginization>({} as Orginization);
+  const [organization, setOrganization] = useState<Orginization>();
   const [allOrganizations, setAllOrganizations] = useState<Orginization[]>([]);
   const [session, setSession] = useState<Session>();
   const router = useRouter();
@@ -69,6 +69,7 @@ export default function UserProvider({ children }: { children: JSX.Element[] }) 
       setAllOrganizations(orgs.flatMap((item) => item.organizations || []));
     }
     if (error) {
+      setAllOrganizations([]);
       console.log(error);
     }
   }

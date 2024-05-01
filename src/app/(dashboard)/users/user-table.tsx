@@ -28,12 +28,17 @@ export default function UserTable({ user }: { user: User }) {
   const { organization } = useContext(UserContext);
 
   useEffect(() => {
-    getUserTable();
-  }, [searchInput, market, organization.id]);
+    if (organization) {
+      getUserTable();
+    }
+  }, [searchInput, market, organization?.id]);
 
   async function getUserTable() {
     setTableIsLoading(true);
-    let searchUsers = supabase.from("profiles").select("*, user_organizations!inner(*)").eq("user_organizations.organization", organization.id);
+    let searchUsers = supabase
+      .from("profiles")
+      .select("*, user_organizations!inner(*)")
+      .eq("user_organizations.organization", organization?.id || 0);
     if (searchInput) searchUsers.textSearch("first_name", searchInput);
     if (market) searchUsers.or(`markets.cs.{${market}}`);
 
@@ -52,7 +57,7 @@ export default function UserTable({ user }: { user: User }) {
     let { data, error } = await supabase
       .from("user_organizations")
       .delete()
-      .eq("id", selectedUser.current?.user_organizations.find((value) => value.organization === organization.id)?.id || "")
+      .eq("id", selectedUser.current?.user_organizations.find((value) => value.organization === organization?.id)?.id || "")
       .select();
     if (data) {
       setShowRemoveUserModal(false);
@@ -61,8 +66,8 @@ export default function UserTable({ user }: { user: User }) {
   }
 
   function AccountType({ user }: { user: User }) {
-    const type = user.user_organizations.find((org) => org.organization === organization.id)?.type;
-    const role = user.user_organizations.find((org) => org.organization === organization.id)?.role;
+    const type = user.user_organizations.find((org) => org.organization === organization?.id)?.type;
+    const role = user.user_organizations.find((org) => org.organization === organization?.id)?.role;
     switch (type) {
       case "client":
         switch (role) {
@@ -210,8 +215,8 @@ export default function UserTable({ user }: { user: User }) {
         </Table>
       ) : (
         <div className="mx-auto my-24">
-          <h5 className="mb-2 text-2xl font-bold text-gray-600 dark:text-white text-center">No Results</h5>
-          <p className="mb-2 text-sm text-gray-400 dark:text-white text-center">There are currently no orders.</p>
+          <h5 className="mb-2 text-2xl font-bold text-gray-600 dark:text-white text-center">No Users</h5>
+          <p className="mb-2 text-sm text-gray-400 dark:text-white text-center">You do not appear to be linked to any organizations.</p>
         </div>
       )}
       <ConfirmationModal

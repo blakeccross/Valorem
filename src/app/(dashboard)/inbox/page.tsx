@@ -174,6 +174,11 @@ export default function Inbox() {
                     </div> */}
                   </div>
                 ))}
+              {conversations?.length === 0 && (
+                <div className="flex flex-1 flex-col text-center justify-center items-center">
+                  <h5 className="text-2xl font-bold text-gray-400 dark:text-white">No Messages</h5>
+                </div>
+              )}
             </div>
           </div>
         </div>
