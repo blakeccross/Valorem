@@ -19,9 +19,11 @@ import ActiveOrder from "./components/activeOrder";
 import Warranties from "./components/warranties";
 import Settings from "./components/settings";
 import History from "./components/history";
-type Product = Database["public"]["Tables"]["products"]["Row"];
+type Item = Database["public"]["Tables"]["line_items"]["Row"];
+type Product = Database["public"]["Tables"]["order_items"]["Row"] & {
+  item_id: Item;
+};
 type Order = Database["public"]["Tables"]["orders"]["Row"];
-type ProductArray = [Product];
 interface COProduct extends Product {
   status: string;
 }
@@ -66,7 +68,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
   async function getProducts() {
     setProductsLoading(true);
-    let { data: products, error } = await supabase.from("products").select("*").eq("orderId", params.id);
+    let { data: products, error } = await supabase.from("order_items").select("*, item_id!inner(*)").eq("order_id", params.id).returns<Product[]>();
     if (products) {
       setProducts(products);
       coProducts.current = products;
@@ -91,7 +93,7 @@ export default function Page({ params }: { params: { id: string } }) {
   }
 
   async function getPreviousProducts(id: number) {
-    let { data: products, error } = await supabase.from("products").select("*").eq("orderId", id);
+    let { data: products, error } = await supabase.from("order_items").select("*, item_id!inner(*)").eq("order_id", id);
     if (products) {
       previousProducts.current = products;
       getChangeOrder();
@@ -108,8 +110,8 @@ export default function Page({ params }: { params: { id: string } }) {
     let ProductArray2 = previousProducts.current;
 
     ProductArray1.forEach((obj1) => {
-      const noChange = ProductArray2.find((obj2) => obj2.description === obj1.description && obj2.price === obj1.price);
-      const updatedPrice = ProductArray2.find((obj2) => obj2.description === obj1.description && obj2.price !== obj1.price);
+      const noChange = ProductArray2.find((obj2) => obj2.item_id.description === obj1.item_id.description && obj2.price === obj1.price);
+      const updatedPrice = ProductArray2.find((obj2) => obj2.item_id.description === obj1.item_id.description && obj2.price !== obj1.price);
       if (noChange) {
         resultArray.push({ ...noChange, status: "same" });
       } else if (updatedPrice) {
@@ -120,85 +122,18 @@ export default function Page({ params }: { params: { id: string } }) {
     });
 
     ProductArray2.forEach((obj2) => {
-      const foundInResult = resultArray.find((obj) => obj.description === obj2.description);
+      const foundInResult = resultArray.find((obj) => obj.item_id.description === obj2.item_id.description);
       if (!foundInResult) {
         resultArray.push({ ...obj2, status: "removed" });
       }
     });
 
     setProducts(resultArray);
-
-    // setProducts(MergeProductsbyKey(resultArray, "type"));
-  }
-
-  async function createChangeOrder() {
-    let formattedProducts = products.map((item) => ({
-      description: item.description,
-      price: item.price,
-      quantity: item.quantity,
-      size: item.size,
-      type: item.type,
-    }));
-    let allProducts = [...formattedProducts, ...addedProducts];
-
-    let totalCost = allProducts.reduce(function (acc, val) {
-      return acc + val.price;
-    }, 0);
-
-    if (order?.id !== order?.order_id || products.length > 0) {
-      const { data: orderSuccess, error } = await supabase
-        .from("orders")
-        .insert([
-          {
-            project_name: order?.project_name,
-            start_date: null,
-            address: order?.address,
-            location: order?.location,
-            description: order?.description,
-            size: order?.size,
-            trade: order?.trade,
-            order_id: order?.order_id,
-            change_order: true,
-            cost: totalCost,
-          },
-        ])
-        .select()
-        .limit(1)
-        .single();
-      if (orderSuccess) {
-        let allProductsUpdatedId = allProducts.map((item) => ({
-          description: item.description,
-          price: item.price,
-          quantity: item.quantity,
-          size: item.size,
-          type: item.type,
-          orderId: orderSuccess.id,
-        }));
-        const { data, error } = await supabase.from("products").insert(allProductsUpdatedId).select();
-        if (error) {
-          alert(error.message);
-        }
-        if (data) {
-          router.push(`/order/${orderSuccess.id}?orderId=${orderSuccess.order_id}`);
-        }
-      }
-      if (error) {
-        alert(error.message);
-      }
-    } else {
-      const { data, error } = await supabase.from("products").insert(addedProducts).select();
-      if (error) {
-        alert(error.message);
-      }
-      if (data) {
-        router.refresh();
-      }
-    }
   }
 
   if (order && user)
     return (
-      <section className="p-5">
+      <section className="p-5 w-full">
         <Banner className=" mb-10">
           <div className="flex-col justify-between rounded-lg border border-gray-100 bg-amber-300 p-4 shadow-sm dark:border-gray-600 dark:bg-gray-700 md:flex-row lg:max-w-7xl">
             <div className="mb-3 mr-4 flex flex-col items-start md:mb-0 md:flex-row md:items-center">
